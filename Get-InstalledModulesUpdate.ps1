@@ -1,4 +1,33 @@
 ﻿ Clear-Host
+ 
+  <#Information
+ 
+     Author: thewatchernode
+     Contact: author@blogabout.cloud
+     Published: 21st May 2019
+
+     .DESCRIPTION
+     Tool to assist with removal of legacy Microsoft Team Module
+
+     Version Changes            : 0.1 Initial Script Build
+                                : 1.0 Initial Build Release
+                                : 1.1 Minor Modification
+
+     .LINK
+     
+
+     .EXAMPLE
+     .\get-installedmoduleupdates.ps1
+
+     Description
+     -----------
+     Runs script with default values.
+
+
+     .INPUTS
+     None. You cannot pipe objects to this script.
+ #>
+  
  #region Shortnames
  $Red = 'Red'
  $Green = 'Green'
