@@ -134,7 +134,7 @@
  }
  #endregion
  Test-IsAdmin
- Write-host 'Version information - You are running script version 1.2' -ForegroundColor $White -BackgroundColor $DarkGray
+ Write-host 'Version information - You are running script version 1.3' -ForegroundColor $White -BackgroundColor $DarkGray
   @'
   ┌─────────────────────────────────────────────────────────────┐
            Updating your PSGallery PowerShell Modules
