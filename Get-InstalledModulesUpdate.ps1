@@ -13,6 +13,7 @@
     : 1.1 Minor Modification
     : 1.2 Minor Modification
     : 1.3 Included logging
+    : 1.4 Bug fixes 
 
      
     .EXAMPLE
@@ -79,7 +80,7 @@
 
      if ($ModuleCheck) {
        Write-Host 'Info: Detected an installation of the',$Module.Name,'Module' -ForegroundColor $Green
-       $Module = Get-Module -Name $Module.Name -ListAvailable
+       $Module = Get-InstalledModule -Name $Module.Name #-ListAvailable
        # Identify modules with multiple versions installed
        $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
        # Check Module from PSGallery
@@ -103,7 +104,7 @@
            Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Warning: Legacy Version of',$Module.name,'module detected. Starting removing process'
            Uninstall-Module -Name $Module.Name -RequiredVersion $module.version 
            Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Info: Legacy Version of',$Module.name,'module now removed'
-           Install-Module -Name $Module.Name -RequiredVersion $online.Version -Force
+           Install-Module -Name $Module.Name -RequiredVersion $online.Version -Force -allowclobber
          }
          else {
            $UpdateAvailable = 'No update required'
@@ -134,7 +135,7 @@
  }
  #endregion
  Test-IsAdmin
- Write-host 'Version information - You are running script version 1.3' -ForegroundColor $White -BackgroundColor $DarkGray
+ Write-host 'Version information - You are running script version 1.4' -ForegroundColor $White -BackgroundColor $DarkGray
   @'
   ┌─────────────────────────────────────────────────────────────┐
            Updating your PSGallery PowerShell Modules
