@@ -44,8 +44,7 @@ param(
 New-Item -ItemType Directory -Path "c:\_build"
 $wc = New-Object Net.webclient
 $wc.DownloadFile($chromeinstaller, "$InstallDir\chrome.msi")
-$wc.DownloadFile($CleanWindows, "$InstallDir\Windows_Clean.ps1")
-Start-Sleep 360
+Start-Sleep 90
 #endregion
 
 
@@ -57,8 +56,8 @@ Start-Process "c:\_build\chrome.msi" -ArgumentList "/quiet /norestart" -wait
 
 #region Additional Scripts
 #Run Windows DeClutter. #
-#& C:\_build\Windows_Clean.ps1 -ClearStart
-#Start-Sleep 90
+& C:\_build\Windows_Clean.ps1 -ClearStart
+Start-Sleep 90
 #endregion
 
 #region Cleanup
@@ -68,5 +67,5 @@ Remove-Item "c:\_build" -Recurse -Force
 
 #region Reg Modifications (Example)
 # Set Reg Key
-#Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
+Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
 #endregion
