@@ -601,12 +601,12 @@ Function Get-ATP {
  Test-IsAdmin
  @'
   ┌─────────────────────────────────────────────────────────────┐
-        Detect Microsoft Cloud legacy PowerShell Modules
+            Common PowerShell modules of the IT Pro
 
                Follow @thewatchernode on Twitter                               
   └─────────────────────────────────────────────────────────────┘
 '@
- Start-Transcript -Path $env:userprofile\Desktop\CloudModuleUpdaterLog.txt
+ Start-Transcript -Path $env:userprofile\Desktop\CommonModulesLog.txt
  Get-MicrosoftTeams
  Get-SharePointOnline
  Get-MSOnline
