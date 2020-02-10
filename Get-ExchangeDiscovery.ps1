@@ -54,7 +54,7 @@ $White = 'White'
 $Unlimited = 'unlimited'
 $NoteProperty = 'NoteProperty'
 $Quit = 'Q'
-$AcoraPath = "$env:HOMEDRIVE\Acora"
+$ExPath = "$env:HOMEDRIVE\ExchangeDiscovery"
 $PSV = $PSVersionTable.PSVersion
 #endregion
 #region Banner
@@ -184,16 +184,16 @@ $PSV = $PSVersionTable.PSVersion
     
     }  until ($Root -eq {$Quit})
   }
-  Function Get-AcoraFolder {
+  Function Get-ExFolder {
     
-    if (Test-Path -Path $AcoraPath)
+    if (Test-Path -Path $ExPath)
     {
-      Write-Host 'Info: Detected that',$AcoraPath,'directory exist' -BackgroundColor DarkCyan
+      Write-Host 'Info: Detected that',$ExPath,'directory exist' -BackgroundColor DarkCyan
     }
     else
     {
-      Write-Host 'Warning: Detected that,'$AcoraPath,"directory doesn't exists, creating folder location" -ForegroundColor Yellow
-      New-Item -ItemType Directory -Force -Path $AcoraPath
+      Write-Host 'Warning: Detected that,'$ExPath,"directory doesn't exists, creating folder location" -ForegroundColor Yellow
+      New-Item -ItemType Directory -Force -Path $ExPath
     }
   }
   Function Get-WaitISE {
@@ -240,31 +240,29 @@ $PSV = $PSVersionTable.PSVersion
   }
 # Option 5
   Function Get-MailboxPermissionReport {
-  
-
  
 }
   Function Get-SharedMailboxReport {
-  Write-Host ('Info: Downloading Shared Mailboxes Permissions Report to {0}' -f $AcoraPath) -BackgroundColor $DarkCyan
+  Write-Host ('Info: Downloading Shared Mailboxes Permissions Report to {0}' -f $ExPath) -BackgroundColor $DarkCyan
   Get-Mailbox -RecipientTypeDetails SharedMailbox | Get-MailboxPermission | Select-Object -Property Identity,User,@{Name='Access Rights'
-  Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -Path $AcoraPath\SharedMailbox_Permissions.csv -NoTypeInformation
+  Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -Path $ExPath\SharedMailbox_Permissions.csv -NoTypeInformation
 }
   Function Get-RoomMailboxReport {
-  Write-Host ('Info: Downloading Room Mailboxes Permissions Report to {0}' -f $AcoraPath) -BackgroundColor $DarkCyan
+  Write-Host ('Info: Downloading Room Mailboxes Permissions Report to {0}' -f $ExPath) -BackgroundColor $DarkCyan
   Get-Mailbox -RecipientTypeDetails RoomMailbox | Get-MailboxPermission | Select-Object -Property Identity,User,@{Name='Access Rights'
-  Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -Path $AcoraPath\RoomMailbox_Permissions.csv -NoTypeInformation
+  Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -Path $ExPath\RoomMailbox_Permissions.csv -NoTypeInformation
 }
   Function Get-EquipmentMailboxReport {
-  Write-Host ('Info: Downloading Equipment Mailboxes Permissions Report to {0}' -f $AcoraPath) -BackgroundColor $DarkCyan
+  Write-Host ('Info: Downloading Equipment Mailboxes Permissions Report to {0}' -f $ExPath) -BackgroundColor $DarkCyan
   Get-Mailbox -RecipientTypeDetails EquipmentMailbox | Get-MailboxPermission | Select-Object -Property Identity,User,@{Name='Access Rights'
-  Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -Path $AcoraPath\EquipmentMailbox_Permissions.csv -NoTypeInformation
+  Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -Path $ExPath\EquipmentMailbox_Permissions.csv -NoTypeInformation
 }
   Function Get-MailboxForwarding {
-  Write-Host ('Info: Downloading Mailboxes Forwarding Permissions Report to {0}' -f $AcoraPath) -BackgroundColor $DarkCyan
-  Get-Mailbox -ResultSize Unlimited| Where-Object {$_.ForwardingAddress -ne $null} | Select-Object -Property Name, ForwardingAddress, DeliverToMailboxAndForward | Export-CSV -Path $AcoraPath\MailboxForwardingReport.csv
+  Write-Host ('Info: Downloading Mailboxes Forwarding Permissions Report to {0}' -f $ExPath) -BackgroundColor $DarkCyan
+  Get-Mailbox -ResultSize Unlimited| Where-Object {$_.ForwardingAddress -ne $null} | Select-Object -Property Name, ForwardingAddress, DeliverToMailboxAndForward | Export-CSV -Path $ExPath\MailboxForwardingReport.csv
 }
   Function Get-MailboxAlias {
-  Write-Host ('Info: Downloading Mailboxes Alias Report to {0}' -f $AcoraPath) -BackgroundColor $DarkCyan
+  Write-Host ('Info: Downloading Mailboxes Alias Report to {0}' -f $ExPath) -BackgroundColor $DarkCyan
   $Mailboxes = Get-Recipient -ResultSize Unlimited -RecipientType UserMailbox |
   Sort-Object -Property @{ Expression = { $_.EmailAddresses.Count } } -Descending
 
@@ -289,12 +287,11 @@ $PSV = $PSVersionTable.PSVersion
     New-Object -TypeName PSObject -Property $Properties
     }
 
-  $Results | Export-Csv -Path $AcoraPath\MailboxAliasReport.csv -NoTypeInformation
-
+  $Results | Export-Csv -Path $ExPath\MailboxAliasReport.csv -NoTypeInformation
 
 }
   Function Get-DisabledUserwithMailbox {
-  Write-Host ('Info: Downloading Disabled User Mailboxes Report to {0}' -f $AcoraPath)
+  Write-Host ('Info: Downloading Disabled User Mailboxes Report to {0}' -f $ExPath)
   $Mailboxes = Get-Mailbox | Where-Object {$_.RecipientTypeDetails -eq 'UserMailbox'}
   $Disabled = @()
 
@@ -303,7 +300,7 @@ $PSV = $PSVersionTable.PSVersion
         $Disabled += Get-MailboxStatistics $Mailbox.samaccountname | Select-Object -Property DisplayName,TotalItemSize
     }    
   }
-  $Disabled | Export-Csv -Path $AcoraPath\DisabledUserwithMailbox.csv -NoTypeInformation
+  $Disabled | Export-Csv -Path $ExPath\DisabledUserwithMailbox.csv -NoTypeInformation
   }
   Function Get-DistributionGroup {
    
@@ -328,22 +325,22 @@ $PSV = $PSVersionTable.PSVersion
       $reportoutput += $report
     }
     #Write-Host 'Info: Downloading Distribution Group Report to {0}' -f $AcoraPath
-    $reportoutput | Export-Csv -Path $AcoraPath\DistributionListReport.csv -NoTypeInformation -Encoding UTF8 -append
+    $reportoutput | Export-Csv -Path $ExPath\DistributionListReport.csv -NoTypeInformation -Encoding UTF8 -append
   }
   Function Get-DatabaseCount {
-  Write-Host ('Info: Downloading Mailbox Count per Database Report to {0}' -f $AcoraPath) -BackgroundColor $DarkCyan
-  Get-Mailbox -resultsize $unlimited | Group-Object -Property:Database | Select-Object -Property Name,Count | Sort-Object -Property Name | Select-Object -Property * | Out-File -FilePath $AcoraPath\MailboxCountPerDatabase.txt
+  Write-Host ('Info: Downloading Mailbox Count per Database Report to {0}' -f $ExPath) -BackgroundColor $DarkCyan
+  Get-Mailbox -resultsize $unlimited | Group-Object -Property:Database | Select-Object -Property Name,Count | Sort-Object -Property Name | Select-Object -Property * | Out-File -FilePath $ExPath\MailboxCountPerDatabase.txt
 }    
   Function Get-Counts {
     
     $count
     Get-WaitISE
     
-    # Acora Folder
-    Get-AcoraFolder
+    # Folder
+    Get-ExFolder
     
     # Transcript
-    Start-Transcript -Path $AcoraPath\Log_MailboxDataReport.txt
+    Start-Transcript -Path $ExPath\Log_MailboxDataReport.txt
     
     # Mailbox Counts
     $mailbox = get-mailbox -resultsize $Unlimited
@@ -374,16 +371,12 @@ $PSV = $PSVersionTable.PSVersion
   }
 # Option 6
   Function Get-ExchangeVersion {
-
-    
     
     $ExchangeServers = Get-ExchangeServer  | Sort-Object Name
 
     ForEach  ($Server in $ExchangeServers)
     {
-
     Get-ExchangeServer -name $Server.Name | Format-List Name, Edition, AdminDisplayVersion
-
     }
 
   }
@@ -391,77 +384,77 @@ $PSV = $PSVersionTable.PSVersion
   If (Get-MailboxDatabase | Where-Object {$_.MasterType -eq 'DatabaseAvailabilityGroup'})
   {
     Write-Host 'Info: Gathering Database Availabilty Group information' -BackgroundColor $DarkCyan
-    Get-DatabaseAvailabilityGroup -Status | Format-List | Out-File -FilePath $AcoraPath\DAGConfig.txt
-    Get-DatabaseAvailabilityGroupNetwork | Format-List | Out-File -FilePath $AcoraPath\DAGNetworkConfig.txt
+    Get-DatabaseAvailabilityGroup -Status | Format-List | Out-File -FilePath $ExPath\DAGConfig.txt
+    Get-DatabaseAvailabilityGroupNetwork | Format-List | Out-File -FilePath $ExPath\DAGNetworkConfig.txt
   }
   Else {Write-Host 'Warning: Unable to detected an active DAG' -ForegroundColor $Red
   }
 }
   Function Get-Databases {
   Write-Host 'Info: Gathering Mailbox Databases information' -BackgroundColor $DarkCyan
-  Get-MailboxDatabase -Status | Select-Object Name,Server,Recovery,EDBFilePath,LogFolderPath,IndexEnabled,*Quota*,LastFullBackup | Out-File -FilePath $AcoraPath\ExchangeMailboxDatabases.txt
+  Get-MailboxDatabase -Status | Select-Object Name,Server,Recovery,EDBFilePath,LogFolderPath,IndexEnabled,*Quota*,LastFullBackup | Out-File -FilePath $ExPath\ExchangeMailboxDatabases.txt
   Write-Host 'Info: Gathering Public Folder Database information' -BackgroundColor $DarkCyan
-  Get-PublicFolderDatabase -Status | Select-Object Name,Server,EDBFilePath,LogFolderPath,IndexEnabled,*Quota*,*Backup* | Out-File -FilePath $AcoraPath\ExchangePublicFolderDatabases.txt
+  Get-PublicFolderDatabase -Status | Select-Object Name,Server,EDBFilePath,LogFolderPath,IndexEnabled,*Quota*,*Backup* | Out-File -FilePath $ExPath\ExchangePublicFolderDatabases.txt
  }
   Function Get-Mailflow {
   Write-Host 'Info: Gathering Send Connector information' -BackgroundColor $DarkCyan
-  Get-SendConnector | Format-List | Out-File -FilePath $AcoraPath\SendConnectorConfiguration.txt -Append
+  Get-SendConnector | Format-List | Out-File -FilePath $ExPath\SendConnectorConfiguration.txt -Append
   Write-Host 'Info: Gathering Receive Connector information' -BackgroundColor $DarkCyan
-  Get-ReceiveConnector | Format-List | Out-File -FilePath $AcoraPath\ReceiveConnectorConfiguration.txt -Append
+  Get-ReceiveConnector | Format-List | Out-File -FilePath $ExPath\ReceiveConnectorConfiguration.txt -Append
   }
   Function Get-AddressPolicy {
   Write-Host 'Info: Gathering Email Address Policy information' -BackgroundColor $DarkCyan
-  Get-EmailAddressPolicy | Select-Object Name,RecipientFilter,LdapRecipientFilter,RecipientFilterApplied,IncludedRecipients,Precanned,Lowest,EnabledPrimarySMTPAddressTemplate,EnabledEmailAddressTemplates,DisabledEmailAddressTemplates,Enabled,HasEmailAddressSetting,HasMailboxManagerSetting | Export-Csv -Path $AcoraPath\EmailAddressPolicies.csv -NoTypeInformation -Append
+  Get-EmailAddressPolicy | Select-Object Name,RecipientFilter,LdapRecipientFilter,RecipientFilterApplied,IncludedRecipients,Precanned,Lowest,EnabledPrimarySMTPAddressTemplate,EnabledEmailAddressTemplates,DisabledEmailAddressTemplates,Enabled,HasEmailAddressSetting,HasMailboxManagerSetting | Export-Csv -Path $ExPath\EmailAddressPolicies.csv -NoTypeInformation -Append
   }
   Function Get-VirtualDirectory {
   
     # Get OWA
     Write-Host 'Info: Gathering OWA Virtual Directory information' -BackgroundColor $DarkCyan
-    Get-OwaVirtualDirectory | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt
+    Get-OwaVirtualDirectory | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt
 
     # Get ECP
     Write-Host 'Info: Gathering ECP Virtual Directory information' -BackgroundColor $DarkCyan
-    Get-EcpVirtualDirectory | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+    Get-EcpVirtualDirectory | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
 
     # Get OAB
     Write-Host 'Info: Gathering OAB Virtual Directory information' -BackgroundColor $DarkCyan    
-    Get-OabVirtualDirectory | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+    Get-OabVirtualDirectory | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
     
     # Get Active Sync
     Write-Host 'Info: Gathering Active Sync Virtual Directory information' -BackgroundColor $DarkCyan
-    Get-ActiveSyncVirtualDirectory | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+    Get-ActiveSyncVirtualDirectory | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
 
     # Get EWS
     Write-Host 'Info: Gathering EWS Virtual Directory information' -BackgroundColor $DarkCyan
-    Get-WebServicesVirtualDirectory | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+    Get-WebServicesVirtualDirectory | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
 
     # Get Mapi Virtual Directory
     Write-Host 'Info: Gathering Mapi Virtual Directory information' -BackgroundColor $DarkCyan
-    Get-MapiVirtualDirectory | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+    Get-MapiVirtualDirectory | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
 
     # Get Outlook Anywhere
     Write-Host 'Info: Gathering Outlook Anywhere Virtual Directory information' -BackgroundColor $DarkCyan
-    Get-OutlookAnywhere | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+    Get-OutlookAnywhere | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
   
   }
   Function Get-CASDetails {
   Write-Host 'Info: Gathering Client Access Server information' -BackgroundColor $DarkCyan
-  Get-ClientAccessServer | Select-Object Server,AutoDiscoverServiceInternalUri | Format-List | Out-File -FilePath $AcoraPath\NamespaceConfiguration.txt -Append
+  Get-ClientAccessServer | Select-Object Server,AutoDiscoverServiceInternalUri | Format-List | Out-File -FilePath $ExPath\NamespaceConfiguration.txt -Append
   }
   Function Get-OuAnywhere {
   Write-Host 'Info: Gathering Client Access Server information' -BackgroundColor $DarkCyan
-  Get-OutlookAnywhere | Format-List | Out-File -FilePath $AcoraPath\OutlookAnywhereConfiguration.txt -Append
+  Get-OutlookAnywhere | Format-List | Out-File -FilePath $ExPath\OutlookAnywhereConfiguration.txt -Append
   }
   Function Get-ServerInfo {
     
     $ServerInfo
     Get-WaitISE
     
-    # Acora Folder
-    Get-AcoraFolder
+    # Folder
+    Get-ExFolder
     
     # Transcript
-    Start-Transcript -Path $AcoraPath\Log_ServerConfigReport.txt
+    Start-Transcript -Path $ExPath\Log_ServerConfigReport.txt
     
     # Server Reporting
 
@@ -494,11 +487,11 @@ $PSV = $PSVersionTable.PSVersion
 # Option 7
   Function Get-ConfigHybrid {
   Write-Host 'Info: Gathering Exchange Hybrid Configuration information' -BackgroundColor $DarkCyan
-  Get-HybridConfiguration | Out-File -FilePath $AcoraPath\HybridConfiguration.txt -Append
+  Get-HybridConfiguration | Out-File -FilePath $ExPath\HybridConfiguration.txt -Append
   }
   Function Get-IntraOrgConnect {
   Write-Host 'Info: Gathering Exchange IntraOrganization Configuration information' -BackgroundColor $DarkCyan
-  Get-IntraOrganizationConfiguration | Out-File -FilePath $AcoraPath\HybridMailFlowConfiguration.txt -Append
+  Get-IntraOrganizationConfiguration | Out-File -FilePath $ExPath\HybridMailFlowConfiguration.txt -Append
   }
   Function Get-AZModule {
   
@@ -541,7 +534,7 @@ $PSV = $PSVersionTable.PSVersion
 
   # Cloud Only
   Write-Host 'Info: Gathering Exchange Hybrid Mail Flow information' -BackgroundColor $DarkCyan
-  Get-HybridMailFlow | Out-File -FilePath $AcoraPath\HybridMailFlowConfiguration.txt -Append
+  Get-HybridMailFlow | Out-File -FilePath $ExPath\HybridMailFlowConfiguration.txt -Append
 
   }
   Function Get-HybridHealth {
@@ -553,7 +546,7 @@ $PSV = $PSVersionTable.PSVersion
     Get-AcoraFolder
     
     # Transcript
-    Start-Transcript -Path $AcoraPath\Log_HybridHealthReport.txt
+    Start-Transcript -Path $ExPath\Log_HybridHealthReport.txt
     
     # Hybrid Health
     
