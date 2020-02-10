@@ -16,6 +16,8 @@
     : 1.3 Tested Microsoft Teams Module 1.0.0
     : 1.4 Improved Functions for Get-TeamsPSVersion and Get-TeamsClientCheck
     : 1.5 Included CloudConnector Module
+    : 1.6 Included ATP Module
+    : 1.7 Included ImportExcel Module
 
     .LINK
      
@@ -48,6 +50,7 @@ $MSOnline = 'MSOnline'
 $SharePointOnline = 'Microsoft.Online.SharePoint.PowerShell'
 $CloudConnector = 'CloudConnect'
 $ATP = 'ORCA'
+$importexcel = 'ImportExcel'
 
 
  
@@ -453,7 +456,7 @@ Function Get-AzureAD {
  }
 # Skype for Business
 Function Get-SfBOModule {
-Start-BitsTransfer -
+  Start-BitsTransfer -
 }
 # Exchange
 Function Get-CCPSVersion {
@@ -559,9 +562,9 @@ Function Get-ATP {
       if ($online.version -gt $module.version) {
         $UpdateAvailable = 'Version removed'
         Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Office ATP Recommended Configuration Analyzer Module detected. Starting removing process"
-        Uninstall-Module -Name $MSOnline -RequiredVersion $module.version 
+        Uninstall-Module -Name $ztp -RequiredVersion $module.version 
         Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Office ATP Recommended Configuration Analyzer Module now removed"
-        Install-Module -Name $MSOnline -RequiredVersion $online.Version -Force
+        Install-Module -Name $atp-RequiredVersion $online.Version -Force
       }
       else {
         $UpdateAvailable = 'No update required'
@@ -593,11 +596,80 @@ Function Get-ATP {
 
   }
 }
+# ImportExcel
+Function Get-ImportExcelPSVersion {
+  # MSOL PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $ImportExcel | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of ImportExcel Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-ImportExcel {
+  $ModuleCheck = Get-InstalledModule -name $ImportExcel -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the ImportExcel Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $ImportExcel -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking ImportExcel module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of ImportExcel module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of ImportExcel Module detected. Starting removing process"
+        Uninstall-Module -Name $ImportExcel -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of ImportExcel Analyzer Module now removed"
+        Install-Module -Name $ImportExcel -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # ImportExcel
+    Get-ImportExcelPSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the ImportExcel Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the ImportExcel Module' -ForegroundColor $Green
+    Install-Module -Name $ImportExcel
+   
+    # ImportExcel
+    Get-ImportExcelPSVersion
+
+  }
+}
  
  #endregion
 #region Script Block
  cls
- Write-host 'Version information - You are running script version 1.6' -ForegroundColor $White -BackgroundColor DarkGray
+ Write-host 'Version information - You are running script version 1.7' -ForegroundColor $White -BackgroundColor DarkGray
  Test-IsAdmin
  @'
   ┌─────────────────────────────────────────────────────────────┐
@@ -613,5 +685,6 @@ Function Get-ATP {
  Get-Azure
  Get-CloudConnector
  Get-ATP
+ Get-ImportExcel
  Stop-Transcript
  #endregion
