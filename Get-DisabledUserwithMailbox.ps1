@@ -1,5 +1,4 @@
-﻿
-# Variables
+﻿# Variables
 $Quit = 'Q'
 
 #region Banner
@@ -11,8 +10,7 @@ $Quit = 'Q'
               Follow me @thewatchernode on Twitter                   
   └─────────────────────────────────────────────────────────────┘
 
-  1)  Get-ADUser      (On-prem)      -->
-  2)  Get-AzureADUser (Cloud)        -->
+  1)  Disabled Cloud Users with Mailboxes      -->
      
   Q) Quit
 
@@ -20,7 +18,7 @@ $Quit = 'Q'
 '@
 #endregion Banner
 #region Functions
-Function Get-ADUser {
+Function Get-DCM {
   
   $Mailboxes = Get-Mailbox | Where-Object {$_.RecipientTypeDetails -eq 'UserMailbox'}
   $Disabled = @()
@@ -32,20 +30,7 @@ Function Get-ADUser {
   }
   $Disabled | Export-Csv -Path $env:userprofile\desktop\DisabledADUserwithMailbox.csv -NoTypeInformation
   }
-Function Get-AzureADUser {
 
-  Connect-MsolService
-  
-  $Mailboxes = Get-Mailbox | Where-Object {$_.RecipientTypeDetails -eq 'UserMailbox'}
-  $Disabled = @()
-
-  Foreach ($Mailbox in $Mailboxes) {
-    if((Get-msolUser -userprincipalname $Mailbox.userprincipalname).Enabled -eq $False){
-        $Disabled += Get-MailboxStatistics $Mailbox.userprincipalname | Select-Object -Property DisplayName,TotalItemSize
-    }    
-  }
-  $Disabled | Export-Csv -Path $env:userprofile\desktop\DisabledAzureADUserwithMailbox.csv -NoTypeInformation
-}
 function Get-Root    {
   # Menu Prompt
   
@@ -54,26 +39,23 @@ function Get-Root    {
       Clear-Host
       switch ($MenuOption){
         1 { # Option 1
-             Get-ADUser
-             Get-Root
+             Get-DCM
           } 
         2 { # Option 2
-             Get-AzureADUser
-             Get-Root
+             
           }
         Q { # Not in use
             Exit
           }
-        4 { # Not in use
+        4 { # Option 4
           }
         5 { # Option 5
-            Get-Root5
+            
           }
         6 { # Option 6
-            Get-Root6
+            
           }  
         
-  
         $Quit {return} 
       }
     
