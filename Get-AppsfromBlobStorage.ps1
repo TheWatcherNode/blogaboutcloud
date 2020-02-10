@@ -56,8 +56,7 @@ Start-Process "c:\_build\chrome.msi" -ArgumentList "/quiet /norestart" -wait
 
 #region Additional Scripts
 #Run Windows DeClutter. #
-& C:\_build\Windows_Clean.ps1 -ClearStart
-Start-Sleep 90
+
 #endregion
 
 #region Cleanup
