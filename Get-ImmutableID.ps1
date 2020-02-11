@@ -10,6 +10,7 @@
     Version Changes            
     : 0.1 Initial Script Build
     : 1.0 Initial Build Release
+    : 1.1 Resolved Option 2 issues not collecting Immuta
 
     .EXAMPLE
     .\set-immutableid.ps1
@@ -387,7 +388,7 @@ clear-host
 Write-Output "I'm version 5.0 or above"
 $PSVersionTable
 Test-IsAdmin
-Write-host 'Version information - You are running script version 1.0' -ForegroundColor White -BackgroundColor DarkGray
+Write-host 'Version information - You are running script version 1.1' -ForegroundColor White -BackgroundColor DarkGray
 Get-Root
 #endregion Code Launch
 
