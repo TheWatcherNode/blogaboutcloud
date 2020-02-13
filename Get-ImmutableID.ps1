@@ -10,7 +10,7 @@
     Version Changes            
     : 0.1 Initial Script Build
     : 1.0 Initial Build Release
-    : 1.1 Resolved Option 2 issues not collecting Immuta
+    : 1.1 Additional fields in AD Output
 
     .EXAMPLE
     .\set-immutableid.ps1
@@ -31,7 +31,6 @@ $DarkRed = 'DarkRed'
 $Green = 'Green'
 $Red = 'Red'
 $Yellow = 'Yellow'
-$Cyan = 'Cyan'
 $White = 'White'
 
 $AzureAD = 'AzureAD'
@@ -71,8 +70,9 @@ $Quit = 'Q'
                 Follow me @thewatchernode on Twitter 
                 
                 
-   This section will gather the UserPrincipleName,SamAccountName 
-   and ImmutableID for all Azure AD Users..                   
+   This section will gather the UserPrincipleName,SamAccountName,
+   DisplayName,CanonicalName, EmailAddress and ImmutableID for 
+   all AD Users..                   
   └─────────────────────────────────────────────────────────────┘
 '@
 [string] $AADRoot = @'
@@ -201,9 +201,9 @@ Function Get-AzureAD {
       #compare versions
       if ($online.version -gt $module.version) {
         $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Warning: Legacy Version of AzureAD Module detected. Starting removing process'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of AzureAD Module detected. Starting removing process"
         Uninstall-Module -Name $AzureAD -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Info: Legacy Version of AzureAD Module now removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of AzureAD Module now removed"
         Install-Module -Name $AzureAD -RequiredVersion $online.Version -Force
       }
       else {
@@ -241,7 +241,7 @@ Function Get-AADConnect {
 Get-AzureADPSVersion
 Get-AzureAD
 
-Write-Host 'INFO: Connecting to Azure Active Directory, prompting for relevant administrative credentials' -BackgroundColor $Green
+Write-Host "INFO: Connecting to Azure Active Directory, prompting for relevant administrative credentials" -BackgroundColor $Green
 Connect-AzureAD
 
 }
@@ -253,11 +253,14 @@ $users | Foreach-Object {
 
     $user = $_
     $immutableid = [System.Convert]::ToBase64String($user.ObjectGUID.tobytearray())
-    $userid = $user | Select-Object @{Name='Access Rights';Expression={[string]::join(', ', $immutableid)}}
+    $userid = $user | select @{Name='Access Rights';Expression={[string]::join(', ', $immutableid)}}
 
     $report = New-Object -TypeName PSObject
     $report | Add-Member -MemberType NoteProperty -Name 'UserPrincipalName' -Value $user.UserPrincipalName
     $report | Add-Member -MemberType NoteProperty -Name 'SamAccountName' -Value $user.samaccountname
+    $report | Add-Member -MemberType NoteProperty -Name 'DisplayName' -Value $user.displayname
+    $report | Add-Member -MemberType NoteProperty -Name 'CanonicalName' -Value $user.canonicalname
+    $report | Add-Member -MemberType NoteProperty -Name 'EmailAddress' -Value $user.emailaddress
     $report | Add-Member -MemberType NoteProperty -Name 'ImmutableID' -Value $immutableid
     $reportoutput += $report
 }
@@ -270,8 +273,8 @@ $users = Get-ADUser -Filter * -Properties *
 $users | Foreach-Object {
 
     $user = $_
-    $immutableid = [System.Convert]::ToBase64String($user.ObjectGUID.tobytearray())
-    $userid = $user | Select-Object @{Name='Access Rights';Expression={[string]::join(', ', $immutableid)}}
+    $immutableid = "[System.Convert]::ToBase64String($user.ObjectGUID.tobytearray())"
+    $userid = $user | select @{Name='Access Rights';Expression={[string]::join(', ', $immutableid)}}
 
     $report = New-Object -TypeName PSObject
     $report | Add-Member -MemberType NoteProperty -Name 'UserPrincipalName' -Value $user.UserPrincipalName
@@ -283,17 +286,17 @@ $users | Foreach-Object {
 $reportoutput | Export-Csv -Path $env:USERPROFILE\desktop\ImmutableID4AAD.csv -NoTypeInformation -Encoding UTF8 }
 Function Get-RenameCSVtoXLSX {
 
-    $proj_files = Get-ChildItem | Where-Object {$_.Extension -ne '.jpg'}
+    $proj_files = Get-ChildItem | Where-Object {$_.Extension -ne ".jpg"}
     ForEach ($file in $proj_files) {
-    $filenew = $file.Name + '.xlsx'
+    $filenew = $file.Name + ".xlsx"
     Rename-Item $file $filenew
     }
 }
 Function Get-RenameXLSXtoCSV {
 
-    $proj_files = Get-ChildItem | Where-Object {$_.Extension -ne '.jpg'}
+    $proj_files = Get-ChildItem | Where-Object {$_.Extension -ne ".jpg"}
     ForEach ($file in $proj_files) {
-    $filenew = $file.Name + '.csv'
+    $filenew = $file.Name + ".csv"
     Rename-Item $file $filenew
     }
 }
@@ -330,9 +333,9 @@ Function Get-ImportExcel {
       #compare versions
       if ($online.version -gt $module.version) {
         $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Warning: Legacy Version of ImportExcel Module detected. Starting removing process'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of ImportExcel Module detected. Starting removing process"
         Uninstall-Module -Name $ImportExcel -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Info: Legacy Version of ImportExcel Analyzer Module now removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of ImportExcel Analyzer Module now removed"
         Install-Module -Name $ImportExcel -RequiredVersion $online.Version -Force
       }
       else {
@@ -367,7 +370,7 @@ Function Get-ImportExcel {
 }
 Function Get-MergeFiles {
    
-   Clear-Host
+   cls
 
    $ref = Read-Host -Prompt 'Specify your Reference File for example (c:\ref.xlsx)'
    Write-Host -Foreground $Cyan ('You have specified {0}' -f $ref)
@@ -378,7 +381,11 @@ Function Get-MergeFiles {
 
    Merge-Worksheet -Referencefile $ref -Differencefile $dif -OutputFile $out -WorksheetName Sheet1 -Startrow 1 -OutputSheetName Sheet1 -NoHeader
 }
-Function Set-ImmutableID {}
+Function Set-ImmutableID {
+
+
+
+}
 #endregion
 
 
