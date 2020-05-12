@@ -28,7 +28,7 @@
 # The following strings are set to configure the downloads required to complete the deployment. #
 param(
   [String] $InstallDir = "c:\_build",
-  [string] $chromeinstaller = "https://intunestorage2019.blob.core.windows.net/intunestorage/Intune/GoogleChromeStandaloneEnterprise64.msi")
+  [string] $chromeinstaller = "https://xxx/intunestorage/Intune/GoogleChromeStandaloneEnterprise64.msi")
 
   Write-host 'Version information - You are running script version 1.0' -ForegroundColor White -BackgroundColor DarkGray
   @'
@@ -66,5 +66,5 @@ Remove-Item "c:\_build" -Recurse -Force
 
 #region Reg Modifications (Example)
 # Set Reg Key
-Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
+# Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
 #endregion
