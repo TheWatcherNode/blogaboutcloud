@@ -92,6 +92,14 @@ if (!(Test-IsAdmin)){
 else {
   Write-Verbose -Message 'Are you running as an Administator' -verbose
 }
+# PSGallery
+Function Get-TrustedRepo {
+
+Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+Install-PackageProvider -name NuGet -Force
+
+}
+
 # Microsoft Teams
 Function Get-TeamsClientCheck {
   # Microsoft Teams Client Check
@@ -562,9 +570,9 @@ Function Get-ATP {
       if ($online.version -gt $module.version) {
         $UpdateAvailable = 'Version removed'
         Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Office ATP Recommended Configuration Analyzer Module detected. Starting removing process"
-        Uninstall-Module -Name $ztp -RequiredVersion $module.version 
+        Uninstall-Module -Name $ATP -RequiredVersion $module.version 
         Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Office ATP Recommended Configuration Analyzer Module now removed"
-        Install-Module -Name $atp-RequiredVersion $online.Version -Force
+        Install-Module -Name $atp -RequiredVersion $online.Version -Force
       }
       else {
         $UpdateAvailable = 'No update required'
@@ -679,6 +687,7 @@ Function Get-ImportExcel {
   └─────────────────────────────────────────────────────────────┘
 '@
  Start-Transcript -Path $env:userprofile\Desktop\CommonModulesLog.txt
+ Get-TrustedRepo
  Get-MicrosoftTeams
  Get-SharePointOnline
  Get-MSOnline
