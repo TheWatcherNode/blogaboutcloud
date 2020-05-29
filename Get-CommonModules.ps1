@@ -33,7 +33,52 @@
     .INPUTS
     None. You cannot pipe objects to this script.
 #>
+
 #Requires -Version 3.0
+
+#region Elevate Script
+# Original Script located at:
+# http://blogs.msdn.com/b/virtual_pc_guy/archive/2010/09/23/a-self-elevating-powershell-script.aspx
+
+# Get the ID and security principal of the current user account
+$myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
+$myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)
+
+# Get the security principal for the Administrator role
+$adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
+
+# Check to see if we are currently running "as Administrator"
+if ($myWindowsPrincipal.IsInRole($adminRole))
+
+   {
+   # We are running "as Administrator" - so change the title and background color to indicate this
+   $Host.UI.RawUI.WindowTitle = $myInvocation.MyCommand.Definition + "(Elevated)"
+   $Host.UI.RawUI.BackgroundColor = "DarkBlue"
+   clear-host
+
+   }
+else
+   {
+   # We are not running "as Administrator" - so relaunch as administrator
+
+   # Create a new process object that starts PowerShell
+   $newProcess = new-object System.Diagnostics.ProcessStartInfo "PowerShell";
+
+   # Specify the current script path and name as a parameter
+   $newProcess.Arguments = $myInvocation.MyCommand.Definition;
+
+   # Indicate that the process should be elevated
+   $newProcess.Verb = "runas";
+
+   # Start the new process
+   [System.Diagnostics.Process]::Start($newProcess);
+
+   # Exit from the current, unelevated, process
+   exit
+
+   }
+#endregion
+
 #region Shortnames
 
 $DarkCyan = 'DarkCyan'
@@ -56,7 +101,9 @@ $importexcel = 'ImportExcel'
  
 
 #endregion Shortnames
+
 #region Functions
+#region Test-IsAdmin
 function Test-IsAdmin {
   <#
       .SYNOPSIS
@@ -92,15 +139,26 @@ if (!(Test-IsAdmin)){
 else {
   Write-Verbose -Message 'Are you running as an Administator' -verbose
 }
-# PSGallery
+#endregion
+#region Elevate Script
+     # Self-elevate the script if required
+    if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+     if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
+      $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" " + $MyInvocation.UnboundArguments
+      Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
+      Exit
+     }
+    }
+#endregion
+#region PSGallery
 Function Get-TrustedRepo {
 
-Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 Install-PackageProvider -name NuGet -Force
+Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 
 }
-
-# Microsoft Teams
+#endregion
+#region Microsoft Teams
 Function Get-TeamsClientCheck {
   # Microsoft Teams Client Check
   
@@ -187,7 +245,8 @@ Function Get-MicrosoftTeams {
     Get-TeamsClientCheck
   }
 }
-# SharePoint
+#endregion
+#region SharePoint
 Function Get-SPOPSVersion {
   # SharePoint PowerShell Version
   
@@ -256,7 +315,8 @@ Function Get-SharePointOnline {
 
   }
 }
-# MSOnline
+#endregion
+#region MSOnline
 Function Get-MSOLPSVersion {
   # MSOL PowerShell Version
   
@@ -325,7 +385,8 @@ Function Get-MSOnline {
 
   }
 }
-# Azure
+#endregion
+#region Azure
 Function Get-AzurePSVersion {
   # SharePoint PowerShell Version
   
@@ -462,11 +523,8 @@ Function Get-AzureAD {
 
   }
  }
-# Skype for Business
-Function Get-SfBOModule {
-  Start-BitsTransfer -
-}
-# Exchange
+#endregion
+#region Exchange
 Function Get-CCPSVersion {
   # MSOL PowerShell Version
   
@@ -535,7 +593,8 @@ Function Get-CloudConnector {
 
   }
 }
-# ATP
+#endregion
+#region ATP
 Function Get-ATPPSVersion {
   # MSOL PowerShell Version
   
@@ -604,7 +663,8 @@ Function Get-ATP {
 
   }
 }
-# ImportExcel
+#endregion
+#region ImportExcel
 Function Get-ImportExcelPSVersion {
   # MSOL PowerShell Version
   
@@ -673,12 +733,13 @@ Function Get-ImportExcel {
 
   }
 }
- 
  #endregion
+ #endregion
+
 #region Script Block
  cls
  Write-host 'Version information - You are running script version 1.7' -ForegroundColor $White -BackgroundColor DarkGray
- Test-IsAdmin
+ #Test-IsAdmin
  @'
   ┌─────────────────────────────────────────────────────────────┐
             Common PowerShell modules of the IT Pro
@@ -686,7 +747,7 @@ Function Get-ImportExcel {
                Follow @thewatchernode on Twitter                               
   └─────────────────────────────────────────────────────────────┘
 '@
- Start-Transcript -Path $env:userprofile\Desktop\CommonModulesLog.txt
+ Start-Transcript -Path $env:homedrive\PowerShellModulesInstallLog.txt
  Get-TrustedRepo
  Get-MicrosoftTeams
  Get-SharePointOnline

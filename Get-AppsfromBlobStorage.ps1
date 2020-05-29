@@ -25,13 +25,13 @@
     .INPUTS
     None. You cannot pipe objects to this script.
 #>
-
-# The following strings are set to configure the downloads required to complete the deployment. #
+[CmdletBinding()]
 param(
-  [String] $InstallDir = "c:\_build",
-  [string] $wincleaner = "https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Windows_Clean.ps1")
+  [String] $InstallDir = "$env:HOMEDRIVE\_build",
+  [String] $BoxDrive = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Box-x64.msi',
+  [String] $wincleaner = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Windows_Clean.ps1')
 
-  Write-host 'Version information - You are running script version 1.1' -ForegroundColor White -BackgroundColor DarkGray
+  Write-host 'Version information - You are running script version 1.2' -ForegroundColor White -BackgroundColor DarkGray
   @'
   ┌─────────────────────────────────────────────────────────────┐
            Installing Applications from Blob Storage
@@ -41,36 +41,60 @@ param(
 '@
 
 #region Download Application Installers
+
+
 # Download the files required. #
-New-Item -ItemType Directory -Path "c:\_build"
-$wc = New-Object Net.webclient
-$wc.DownloadFile($wincleaner, "$InstallDir\Windows_Clean.ps1")
-Start-Sleep 90
+  New-Item -ItemType Directory -Path "$env:HOMEDRIVE\_build"
+  $wc = New-Object -TypeName Net.webclient
+  $wc.DownloadFile($wincleaner, ('{0}\Windows_Clean.ps1' -f $InstallDir))
+  $wc.DownloadFile($BoxDrive, ('{0}\Box-x64.msi' -f $InstallDir))
+  Start-Sleep -Seconds 15
+  
 #endregion
 
 #region Install Applications
-
-#Install 
-
+Function Get-InstallApps {
+# Install Box Drive. 
+  Write-Host 'Installing BoxDrive' -ForegroundColor Green
+  Start-Process -FilePath "$env:homedrive\_build\Box-x64.msi" -ArgumentList '/quiet' -Wait
+  }
 #endregion
 
 #region Additional Scripts
-#Run Windows DeClutter. 
-& C:\_build\Windows_Clean.ps1 -ClearStart
+Function Get-AddScripts {
+# Script 1 
+ & C:\_build\Windows_Clean.ps1 -ClearStart
+   Start-Sleep 20
+   }
+
 #endregion
 
 #region Cleanup
-#Delete Build Folder. #
-Remove-Item "c:\_build" -Recurse -Force
+
+Function Get-CleanUp {
+# Delete Build Folder
+  Remove-Item -Path "$env:HOMEDRIVE\_build" -Recurse -Force
 
 # Rename and Disable Local Admin Account
-Write-Host "Rename local Admin Account to #NotInUse#" -ForegroundColor Green
-Rename-LocalUser -Name "Administrator" -NewName "#NotInUse#" -ErrorAction SilentlyContinue
-Get-LocalUser "#NotInUse#" | Disable-LocalUser -ErrorAction SilentlyContinue
+  #Write-Host "Rename local Admin Account to #NotInUse#" -ForegroundColor Green
+  #Rename-LocalUser -Name "Administrator" -NewName "#NotInUse#" -ErrorAction SilentlyContinue
+  #Get-LocalUser "#NotInUse#" | Disable-LocalUser -ErrorAction SilentlyContinue
+  }
 
 #endregion
 
 #region Reg Modifications (Example)
+
+Function Get-RegMod {
 # Set Reg Key
-#Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
+  #Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
+  }
 #endregion
+
+Start-Transcript $env:userprofile\desktop\log.txt
+
+Get-InstallApps
+Get-AddScripts
+Get-CleanUp
+Get-RegMod
+Stop-Transcript
