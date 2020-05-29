@@ -18,6 +18,7 @@
     : 1.5 Included CloudConnector Module
     : 1.6 Included ATP Module
     : 1.7 Included ImportExcel Module
+    : 1.8 Microsoft Graph Module  
 
     .LINK
      
@@ -96,6 +97,7 @@ $SharePointOnline = 'Microsoft.Online.SharePoint.PowerShell'
 $CloudConnector = 'CloudConnect'
 $ATP = 'ORCA'
 $importexcel = 'ImportExcel'
+$graph = 'Microsoft.Graph.Intune'
 
 
  

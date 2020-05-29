@@ -27,9 +27,11 @@
 #>
 [CmdletBinding()]
 param(
+
   [String] $InstallDir = "$env:HOMEDRIVE\_build",
   [String] $BoxDrive = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Box-x64.msi',
   [String] $wincleaner = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Windows_Clean.ps1')
+
 
   Write-host 'Version information - You are running script version 1.2' -ForegroundColor White -BackgroundColor DarkGray
   @'
@@ -87,8 +89,10 @@ Function Get-CleanUp {
 
 Function Get-RegMod {
 # Set Reg Key
+
   #Set-ItemProperty -Path "HKLM:\Software\Wow6432Node\Javasoft\Java Update\Policy" -Name "EnableJavaUpdate" -Value 0
   }
+
 #endregion
 
 Start-Transcript $env:userprofile\desktop\log.txt

@@ -59,6 +59,8 @@ C:\Windows\System32\Robocopy.exe $source $destination /mov /e /fp /njh /njs /x /
 
 #region Cleanup
 #Delete TeamImages Folder. #
-#Remove-Item "$env:HOMEDRIVE\_TeamsImages" -Recurse -Force
+
+Remove-Item "$env:HOMEDRIVE\_TeamsImages" -Recurse -Force
+
 #endregion
 
