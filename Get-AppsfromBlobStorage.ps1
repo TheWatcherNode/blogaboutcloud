@@ -30,7 +30,7 @@ param(
 
   [String] $InstallDir = "$env:HOMEDRIVE\_build",
   [String] $BoxDrive = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Box-x64.msi',
-  [String] $wincleaner = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Windows_Clean.ps1')
+  [String] $wincleaner = 'https://blogaboutcloud.blob.core.windows.net/intuneblogaboutcloud/Tools/Get-Windows_Debloater.ps1')
 
 
   Write-host 'Version information - You are running script version 1.2' -ForegroundColor White -BackgroundColor DarkGray
@@ -48,7 +48,7 @@ param(
 # Download the files required. #
   New-Item -ItemType Directory -Path "$env:HOMEDRIVE\_build"
   $wc = New-Object -TypeName Net.webclient
-  $wc.DownloadFile($wincleaner, ('{0}\Windows_Clean.ps1' -f $InstallDir))
+  $wc.DownloadFile($wincleaner, ('{0}\Get-Windows_Debloater.ps1' -f $InstallDir))
   $wc.DownloadFile($BoxDrive, ('{0}\Box-x64.msi' -f $InstallDir))
   Start-Sleep -Seconds 15
   
@@ -65,7 +65,7 @@ Function Get-InstallApps {
 #region Additional Scripts
 Function Get-AddScripts {
 # Script 1 
- & C:\_build\Windows_Clean.ps1 -ClearStart
+ & C:\_build\Get-Windows_Debloater.ps1
    Start-Sleep 20
    }
 
@@ -95,10 +95,10 @@ Function Get-RegMod {
 
 #endregion
 
-Start-Transcript $env:userprofile\desktop\log.txt
+#Start-Transcript $env:userprofile\desktop\log.txt
 
-Get-InstallApps
+#Get-InstallApps
 Get-AddScripts
 Get-CleanUp
-Get-RegMod
-Stop-Transcript
+#Get-RegMod
+#Stop-Transcript
