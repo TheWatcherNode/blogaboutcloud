@@ -88,18 +88,16 @@ $Red = 'Red'
 $Yellow = 'Yellow'
 $White = 'White'
 
+$ATP = 'ORCA'
 $Azure = 'Az'
 $AzureAD = 'AzureAD'
+$CloudConnector = 'CloudConnect'
+$EXO = 'ExchangeOnlineManagement'
+$graph = 'Microsoft.Graph.Intune'
+$importexcel = 'ImportExcel'
 $MicrosoftTeams = 'MicrosoftTeams'
 $MSOnline = 'MSOnline'
 $SharePointOnline = 'Microsoft.Online.SharePoint.PowerShell'
-$CloudConnector = 'CloudConnect'
-$ATP = 'ORCA'
-$importexcel = 'ImportExcel'
-$graph = 'Microsoft.Graph.Intune'
-
-
- 
 
 #endregion Shortnames
 
@@ -437,6 +435,78 @@ Function Get-ExoMod {
 
   }
 }
+#endregion
+#region Graph
+Function Get-GraphPSVersion {
+  # MSOL PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $graph | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of GraphlModule' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-Graph {
+  $ModuleCheck = Get-InstalledModule -name $graph -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the Graph Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $graph -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking Graph module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of Graph module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Graph Module detected. Starting removing process"
+        Uninstall-Module -Name $MSOnline -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Graph Module now removed"
+        Install-Module -Name $MSOnline -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # Microsoft Graph
+    Get-GraphPSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the Graph Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the Graph Module' -ForegroundColor $Green
+    Install-Module -Name $graph
+   
+    # Microsoft Microsoft Graph
+    Get-GraphPSVersion
+
+  }
+}
+
+
 #endregion
 #region ImportExcel
 Function Get-ImportExcelPSVersion {
