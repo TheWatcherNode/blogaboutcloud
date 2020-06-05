@@ -807,7 +807,7 @@ Function Get-SharePointOnline {
 }
 #endregion
 
- #region Legacy Modules
+#region Legacy Modules
  Function Get-CCPSVersion {
   # MSOL PowerShell Version
   
