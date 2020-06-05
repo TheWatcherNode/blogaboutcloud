@@ -79,7 +79,6 @@ else
 
    }
 #endregion
-
 #region Shortnames
 
 $DarkCyan = 'DarkCyan'
@@ -160,6 +159,355 @@ Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 
 }
 #endregion
+
+#region ATP
+Function Get-ATPPSVersion {
+  # MSOL PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $ATP | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-ATP {
+  $ModuleCheck = Get-InstalledModule -name $ATP -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $ATP -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking Office ATP Recommended Configuration Analyzer module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of Office ATP Recommended Configuration Analyzer module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Office ATP Recommended Configuration Analyzer Module detected. Starting removing process"
+        Uninstall-Module -Name $ATP -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Office ATP Recommended Configuration Analyzer Module now removed"
+        Install-Module -Name $atp -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # Microsoft Office ATP Recommended Configuration Analyzer
+    Get-ATPPSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $Green
+    Install-Module -Name $ATP
+   
+    # Microsoft Office ATP Recommended Configuration Analyzer
+    Get-ATPPSVersion
+
+  }
+}
+#endregion
+#region Azure
+Function Get-AzurePSVersion {
+  # Azure PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $Azure | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of Azure Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-Azure {
+  $ModuleCheck = Get-InstalledModule -name $Azure -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the Azure Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $Azure -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking Azure module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of Azure module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Azure Module detected. Starting removing process"
+        Uninstall-Module -Name $Azure -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Azure Module now removed"
+        Install-Module -Name $Azure -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # Microsoft Azure PowerShell Version
+    Get-AzurePSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the Azure Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the Azure Module' -ForegroundColor $Green
+    Install-Module -Name $Azure -allowclobber
+   
+    # Microsoft Azure PowerShell Check
+    Get-AzurePSVersion
+
+  }
+}
+Function Get-AzureADPSVersion {
+  # Azure PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $AzureAD | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of AzureAD Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-AzureAD {
+  $ModuleCheck = Get-InstalledModule -name $AzureAD -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the AzureAD Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $AzureAD -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking AzureAD module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of AzureAD module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of AzureAD Module detected. Starting removing process"
+        Uninstall-Module -Name $AzureAD -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of AzureAD Module now removed"
+        Install-Module -Name $AzureAD -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # Microsoft Azure PowerShell Version
+    Get-AzureADPSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the AzureAD Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the AzureAD Module' -ForegroundColor $Green
+    Install-Module -Name $AzureAD
+   
+    # Microsoft Azure PowerShell Check
+    Get-AzureADPSVersion
+
+  }
+ }
+#endregion
+#region Exchange
+Function Get-EXOPSVersion {
+  # Exchange Online PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $EXO | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of Exchange Online Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-ExoMod {
+  $ModuleCheck = Get-InstalledModule -name $EXO -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the Exchange Online Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $EXO -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking Exchange Online module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of Exchange Online module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Exchange Online Module detected. Starting removing process"
+        Uninstall-Module -Name $MSOnline -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Exchange Online Module now removed"
+        Install-Module -Name $MSOnline -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # Microsoft MSOL Version
+    Get-EXOPSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the Exchange Online Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the Exchange Online Module' -ForegroundColor $Green
+    Install-Module -Name $EXO
+   
+    # Exchange Version
+    Get-EXOPSVersion
+
+  }
+}
+#endregion
+#region ImportExcel
+Function Get-ImportExcelPSVersion {
+  # ImportExcel PowerShell Version
+  
+  $ModuleVersion = Get-InstalledModule -Name $ImportExcel | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of ImportExcel Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $moduleversion
+}
+Function Get-ImportExcel {
+  $ModuleCheck = Get-InstalledModule -name $ImportExcel -ErrorAction SilentlyContinue   
+
+  if ($ModuleCheck) {
+    Write-Host 'Info: Detected an installation of the ImportExcel Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $ImportExcel -ListAvailable
+    # Identify modules with multiple versions installed
+    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
+    # Check Module from PSGallery
+    Write-Host 'Checking ImportExcel module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    $gallery = $module | Where-Object {$_.repositorysourcelocation}
+
+    Write-Host 'Comparing installed version against online version of ImportExcel module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    foreach ($module in $gallery) {
+
+      #find the current version in the gallery
+      Try {
+        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
+      }
+      Catch {
+        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
+      }
+
+      #compare versions
+      if ($online.version -gt $module.version) {
+        $UpdateAvailable = 'Version removed'
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of ImportExcel Module detected. Starting removing process"
+        Uninstall-Module -Name $ImportExcel -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of ImportExcel Analyzer Module now removed"
+        Install-Module -Name $ImportExcel -RequiredVersion $online.Version -Force
+      }
+      else {
+        $UpdateAvailable = 'No update required'
+      }
+
+      #write a custom object to the pipeline
+      [pscustomobject]@{
+        Name = $module.name
+        MultipleVersions = ($g.name -contains $module.name)
+        InstalledVersion = $module.version
+        OnlineVersion = $online.version
+        Update = $UpdateAvailable
+        Path = $module.modulebase
+      }
+ 
+    } 
+    # ImportExcel
+    Get-ImportExcelPSVersion
+   
+  }
+  else
+  {
+    Write-Host 'Error: Failed to detect an installation of the ImportExcel Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the ImportExcel Module' -ForegroundColor $Green
+    Install-Module -Name $ImportExcel
+   
+    # ImportExcel
+    Get-ImportExcelPSVersion
+
+  }
+}
+ #endregion
 #region Microsoft Teams
 Function Get-TeamsClientCheck {
   # Microsoft Teams Client Check
@@ -248,76 +596,6 @@ Function Get-MicrosoftTeams {
   }
 }
 #endregion
-#region SharePoint
-Function Get-SPOPSVersion {
-  # SharePoint PowerShell Version
-  
-  $ModuleVersion = Get-InstalledModule -Name $SharePointOnline | Select-Object -Property name,version
-  Write-Host 'Your client machine is running the following version of SharePoint Online Module' -ForegroundColor $White -BackgroundColor $DarkCyan
-  $moduleversion
-}
-Function Get-SharePointOnline {
-  $ModuleCheck = Get-InstalledModule -name $SharePointOnline -ErrorAction SilentlyContinue   
-
-  if ($ModuleCheck) {
-    Write-Host 'Info: Detected an installation of the SharePoint Module' -ForegroundColor $Green
-    $Module = Get-Module -Name $SharePointOnline -ListAvailable
-    # Identify modules with multiple versions installed
-    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
-    # Check Module from PSGallery
-    Write-Host 'Checking SharePoint Online module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
-    $gallery = $module | Where-Object {$_.repositorysourcelocation}
-
-    Write-Host 'Comparing installed version against online version of SharePoint Online module' -ForegroundColor $White -BackgroundColor $DarkCyan
-    foreach ($module in $gallery) {
-
-      #find the current version in the gallery
-      Try {
-        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
-      }
-      Catch {
-        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
-      }
-
-      #compare versions
-      if ($online.version -gt $module.version) {
-        $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of SharePoint Online Module detected. Starting removing process"
-        Uninstall-Module -Name $SharePointOnline -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of SharePoint Online Module now removed"
-        Install-Module -Name $SharePointOnline -RequiredVersion $online.Version -Force
-      }
-      else {
-        $UpdateAvailable = 'No update required'
-      }
-
-      #write a custom object to the pipeline
-      [pscustomobject]@{
-        Name = $module.name
-        MultipleVersions = ($g.name -contains $module.name)
-        InstalledVersion = $module.version
-        OnlineVersion = $online.version
-        Update = $UpdateAvailable
-        Path = $module.modulebase
-      }
- 
-    } 
-    # Microsoft Teams PowerShell Version
-    Get-SPOPSVersion
-   
-  }
-  else
-  {
-    Write-Host 'Error: Failed to detect an installation of the SharePoint Online Module' -ForegroundColor $Red
-    Write-Host 'Info: Attempting an installation of the SharePoint Online Module' -ForegroundColor $Green
-    Install-Module -Name $SharePointOnline
-   
-    # Microsoft Teamd PowerShell Check
-    Get-SPOPSVersion
-
-  }
-}
-#endregion
 #region MSOnline
 Function Get-MSOLPSVersion {
   # MSOL PowerShell Version
@@ -388,27 +666,27 @@ Function Get-MSOnline {
   }
 }
 #endregion
-#region Azure
-Function Get-AzurePSVersion {
+#region SharePoint
+Function Get-SPOPSVersion {
   # SharePoint PowerShell Version
   
-  $ModuleVersion = Get-InstalledModule -Name $Azure | Select-Object -Property name,version
-  Write-Host 'Your client machine is running the following version of Azure Module' -ForegroundColor $White -BackgroundColor $DarkCyan
+  $ModuleVersion = Get-InstalledModule -Name $SharePointOnline | Select-Object -Property name,version
+  Write-Host 'Your client machine is running the following version of SharePoint Online Module' -ForegroundColor $White -BackgroundColor $DarkCyan
   $moduleversion
 }
-Function Get-Azure {
-  $ModuleCheck = Get-InstalledModule -name $Azure -ErrorAction SilentlyContinue   
+Function Get-SharePointOnline {
+  $ModuleCheck = Get-InstalledModule -name $SharePointOnline -ErrorAction SilentlyContinue   
 
   if ($ModuleCheck) {
-    Write-Host 'Info: Detected an installation of the Azure Module' -ForegroundColor $Green
-    $Module = Get-Module -Name $Azure -ListAvailable
+    Write-Host 'Info: Detected an installation of the SharePoint Module' -ForegroundColor $Green
+    $Module = Get-Module -Name $SharePointOnline -ListAvailable
     # Identify modules with multiple versions installed
     $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
     # Check Module from PSGallery
-    Write-Host 'Checking Azure module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+    Write-Host 'Checking SharePoint Online module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
     $gallery = $module | Where-Object {$_.repositorysourcelocation}
 
-    Write-Host 'Comparing installed version against online version of Azure module' -ForegroundColor $White -BackgroundColor $DarkCyan
+    Write-Host 'Comparing installed version against online version of SharePoint Online module' -ForegroundColor $White -BackgroundColor $DarkCyan
     foreach ($module in $gallery) {
 
       #find the current version in the gallery
@@ -422,10 +700,10 @@ Function Get-Azure {
       #compare versions
       if ($online.version -gt $module.version) {
         $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Azure Module detected. Starting removing process"
-        Uninstall-Module -Name $Azure -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Azure Module now removed"
-        Install-Module -Name $Azure -RequiredVersion $online.Version -Force
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of SharePoint Online Module detected. Starting removing process"
+        Uninstall-Module -Name $SharePointOnline -RequiredVersion $module.version 
+        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of SharePoint Online Module now removed"
+        Install-Module -Name $SharePointOnline -RequiredVersion $online.Version -Force
       }
       else {
         $UpdateAvailable = 'No update required'
@@ -442,92 +720,25 @@ Function Get-Azure {
       }
  
     } 
-    # Microsoft Teams PowerShell Version
-    Get-AzurePSVersion
-   
-  }
-  else
-  {
-    Write-Host 'Error: Failed to detect an installation of the Azure Module' -ForegroundColor $Red
-    Write-Host 'Info: Attempting an installation of the Azure Module' -ForegroundColor $Green
-    Install-Module -Name $Azure -allowclobber
-   
-    # Microsoft Teamd PowerShell Check
-    Get-AzurePSVersion
-
-  }
-}
-Function Get-AzureADPSVersion {
-  # SharePoint PowerShell Version
-  
-  $ModuleVersion = Get-InstalledModule -Name $AzureAD | Select-Object -Property name,version
-  Write-Host 'Your client machine is running the following version of AzureAD Module' -ForegroundColor $White -BackgroundColor $DarkCyan
-  $moduleversion
-}
-Function Get-AzureAD {
-  $ModuleCheck = Get-InstalledModule -name $AzureAD -ErrorAction SilentlyContinue   
-
-  if ($ModuleCheck) {
-    Write-Host 'Info: Detected an installation of the AzureAD Module' -ForegroundColor $Green
-    $Module = Get-Module -Name $AzureAD -ListAvailable
-    # Identify modules with multiple versions installed
-    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
-    # Check Module from PSGallery
-    Write-Host 'Checking AzureAD module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
-    $gallery = $module | Where-Object {$_.repositorysourcelocation}
-
-    Write-Host 'Comparing installed version against online version of AzureAD module' -ForegroundColor $White -BackgroundColor $DarkCyan
-    foreach ($module in $gallery) {
-
-      #find the current version in the gallery
-      Try {
-        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
-      }
-      Catch {
-        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
-      }
-
-      #compare versions
-      if ($online.version -gt $module.version) {
-        $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of AzureAD Module detected. Starting removing process"
-        Uninstall-Module -Name $AzureAD -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of AzureAD Module now removed"
-        Install-Module -Name $AzureAD -RequiredVersion $online.Version -Force
-      }
-      else {
-        $UpdateAvailable = 'No update required'
-      }
-
-      #write a custom object to the pipeline
-      [pscustomobject]@{
-        Name = $module.name
-        MultipleVersions = ($g.name -contains $module.name)
-        InstalledVersion = $module.version
-        OnlineVersion = $online.version
-        Update = $UpdateAvailable
-        Path = $module.modulebase
-      }
- 
-    } 
-    # Microsoft Teams PowerShell Version
+    # Microsoft SharePoint PowerShell Version
     Get-SPOPSVersion
    
   }
   else
   {
-    Write-Host 'Error: Failed to detect an installation of the AzureAD Module' -ForegroundColor $Red
-    Write-Host 'Info: Attempting an installation of the AzureAD Module' -ForegroundColor $Green
-    Install-Module -Name $AzureAD
+    Write-Host 'Error: Failed to detect an installation of the SharePoint Online Module' -ForegroundColor $Red
+    Write-Host 'Info: Attempting an installation of the SharePoint Online Module' -ForegroundColor $Green
+    Install-Module -Name $SharePointOnline
    
-    # Microsoft Teamd PowerShell Check
-    Get-AzureADPSVersion
+    # Microsoft SharePoint PowerShell Check
+    Get-SPOPSVersion
 
   }
- }
+}
 #endregion
-#region Exchange
-Function Get-CCPSVersion {
+
+ #region Legacy Modules
+ Function Get-CCPSVersion {
   # MSOL PowerShell Version
   
   $ModuleVersion = Get-InstalledModule -Name $CloudConnector | Select-Object -Property name,version
@@ -595,147 +806,9 @@ Function Get-CloudConnector {
 
   }
 }
-#endregion
-#region ATP
-Function Get-ATPPSVersion {
-  # MSOL PowerShell Version
-  
-  $ModuleVersion = Get-InstalledModule -Name $ATP | Select-Object -Property name,version
-  Write-Host 'Your client machine is running the following version of Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $White -BackgroundColor $DarkCyan
-  $moduleversion
-}
-Function Get-ATP {
-  $ModuleCheck = Get-InstalledModule -name $ATP -ErrorAction SilentlyContinue   
 
-  if ($ModuleCheck) {
-    Write-Host 'Info: Detected an installation of the Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $Green
-    $Module = Get-Module -Name $ATP -ListAvailable
-    # Identify modules with multiple versions installed
-    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
-    # Check Module from PSGallery
-    Write-Host 'Checking Office ATP Recommended Configuration Analyzer module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
-    $gallery = $module | Where-Object {$_.repositorysourcelocation}
-
-    Write-Host 'Comparing installed version against online version of Office ATP Recommended Configuration Analyzer module' -ForegroundColor $White -BackgroundColor $DarkCyan
-    foreach ($module in $gallery) {
-
-      #find the current version in the gallery
-      Try {
-        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
-      }
-      Catch {
-        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
-      }
-
-      #compare versions
-      if ($online.version -gt $module.version) {
-        $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of Office ATP Recommended Configuration Analyzer Module detected. Starting removing process"
-        Uninstall-Module -Name $ATP -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of Office ATP Recommended Configuration Analyzer Module now removed"
-        Install-Module -Name $atp -RequiredVersion $online.Version -Force
-      }
-      else {
-        $UpdateAvailable = 'No update required'
-      }
-
-      #write a custom object to the pipeline
-      [pscustomobject]@{
-        Name = $module.name
-        MultipleVersions = ($g.name -contains $module.name)
-        InstalledVersion = $module.version
-        OnlineVersion = $online.version
-        Update = $UpdateAvailable
-        Path = $module.modulebase
-      }
- 
-    } 
-    # Microsoft Office ATP Recommended Configuration Analyzer
-    Get-ATPPSVersion
-   
-  }
-  else
-  {
-    Write-Host 'Error: Failed to detect an installation of the Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $Red
-    Write-Host 'Info: Attempting an installation of the Office ATP Recommended Configuration Analyzer Module' -ForegroundColor $Green
-    Install-Module -Name $ATP
-   
-    # Microsoft Office ATP Recommended Configuration Analyzer
-    Get-ATPPSVersion
-
-  }
-}
-#endregion
-#region ImportExcel
-Function Get-ImportExcelPSVersion {
-  # MSOL PowerShell Version
-  
-  $ModuleVersion = Get-InstalledModule -Name $ImportExcel | Select-Object -Property name,version
-  Write-Host 'Your client machine is running the following version of ImportExcel Module' -ForegroundColor $White -BackgroundColor $DarkCyan
-  $moduleversion
-}
-Function Get-ImportExcel {
-  $ModuleCheck = Get-InstalledModule -name $ImportExcel -ErrorAction SilentlyContinue   
-
-  if ($ModuleCheck) {
-    Write-Host 'Info: Detected an installation of the ImportExcel Module' -ForegroundColor $Green
-    $Module = Get-Module -Name $ImportExcel -ListAvailable
-    # Identify modules with multiple versions installed
-    $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
-    # Check Module from PSGallery
-    Write-Host 'Checking ImportExcel module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
-    $gallery = $module | Where-Object {$_.repositorysourcelocation}
-
-    Write-Host 'Comparing installed version against online version of ImportExcel module' -ForegroundColor $White -BackgroundColor $DarkCyan
-    foreach ($module in $gallery) {
-
-      #find the current version in the gallery
-      Try {
-        $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
-      }
-      Catch {
-        Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
-      }
-
-      #compare versions
-      if ($online.version -gt $module.version) {
-        $UpdateAvailable = 'Version removed'
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Warning: Legacy Version of ImportExcel Module detected. Starting removing process"
-        Uninstall-Module -Name $ImportExcel -RequiredVersion $module.version 
-        Write-Host -BackgroundColor $DarkRed -ForegroundColor $White "Info: Legacy Version of ImportExcel Analyzer Module now removed"
-        Install-Module -Name $ImportExcel -RequiredVersion $online.Version -Force
-      }
-      else {
-        $UpdateAvailable = 'No update required'
-      }
-
-      #write a custom object to the pipeline
-      [pscustomobject]@{
-        Name = $module.name
-        MultipleVersions = ($g.name -contains $module.name)
-        InstalledVersion = $module.version
-        OnlineVersion = $online.version
-        Update = $UpdateAvailable
-        Path = $module.modulebase
-      }
- 
-    } 
-    # ImportExcel
-    Get-ImportExcelPSVersion
-   
-  }
-  else
-  {
-    Write-Host 'Error: Failed to detect an installation of the ImportExcel Module' -ForegroundColor $Red
-    Write-Host 'Info: Attempting an installation of the ImportExcel Module' -ForegroundColor $Green
-    Install-Module -Name $ImportExcel
-   
-    # ImportExcel
-    Get-ImportExcelPSVersion
-
-  }
-}
  #endregion
+
  #endregion
 
 #region Script Block
@@ -749,14 +822,17 @@ Function Get-ImportExcel {
                Follow @thewatchernode on Twitter                               
   └─────────────────────────────────────────────────────────────┘
 '@
- Start-Transcript -Path $env:homedrive\PowerShellModulesInstallLog.txt
+ Start-Transcript -Path $env:HOMEDRIVE\PowerShellModulesInstallLog.txt
  Get-TrustedRepo
- Get-MicrosoftTeams
- Get-SharePointOnline
- Get-MSOnline
- Get-Azure
- Get-CloudConnector
+
  Get-ATP
+ Get-Azure
+ #Get-CloudConnector
+ Get-ExoMod
  Get-ImportExcel
+ Get-MicrosoftTeams
+ Get-MSOnline
+ Get-SharePointOnline
+ 
  Stop-Transcript
  #endregion
