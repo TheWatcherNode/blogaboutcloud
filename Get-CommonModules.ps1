@@ -899,6 +899,7 @@ Function Get-CloudConnector {
  Get-Azure
  #Get-CloudConnector
  Get-ExoMod
+ Get-Graph
  Get-ImportExcel
  Get-MicrosoftTeams
  Get-MSOnline
