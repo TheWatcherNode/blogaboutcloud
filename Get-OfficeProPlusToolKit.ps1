@@ -42,7 +42,7 @@
   
      Version Changes            : 0.1 Initial Script Build
                                 : 1.0 Initial Build
-                                : 1.1
+                                : 1.1 Microsoft Apps for Enterprise Channel Name Updates
      .LINK
      
 
@@ -94,11 +94,11 @@
   $Quit = 'Q'
   
   # Channel Names 
-  $Monthly = 'Monthly'
-  $SemiAnnualTargeted = 'Targeted'
-  $SemiAnnual = 'Broad'
-  $MonthlyTargeted = 'Insiders'
-  $InsiderFast = 'InsiderFast'
+  $CurrentPreview = 'CurrentPreview'
+  $Current = 'Current'
+  $MonthlyEnterprise = 'MonthlyEnterprise'
+  $SemiAnnual = 'SemiAnnual'
+  $SemiAnnualPreview = 'SemiAnnualPreview'
   $SilentlyContinue = 'SilentlyContinue'
   
   # Colours
@@ -191,13 +191,11 @@
                 Follow me @thewatchernode on Twitter                   
   └─────────────────────────────────────────────────────────────┘
 
-  1)  Configure Monthly Channel                                -->
-  2)  Configure Semi Annual (Targeted) Channel                 -->
-  3)  Configure Semi Annual Channel                            -->
-  4)  Configure Monthly (Targeted) Channel                     -->
-  5)  Configure Insider (Unsupported) Channel                  -->
-  
-
+  1)  Configure Current Channel                                -->
+  2)  Configure Current Channel (Preview)                      -->
+  3)  Configure Monthly Enterprise Channel                     -->
+  4)  Configure Semi-Annual Enterprise Channel                 -->
+  5)  Configure Semi-Annual Enterprise Channel (Preview)       -->
   
   7)  Download the Office Readiness Toolkit for Add-ins & VBS  -->
   8)  Download Microsoft FixIT Removal Tool                    -->
@@ -233,24 +231,19 @@
                 Follow me @thewatchernode on Twitter                   
   └─────────────────────────────────────────────────────────────┘
 
-  1)  Configure Monthly Channel                                -->
-  2)  Configure Semi Annual (Targeted) Channel                 -->
-  3)  Configure Semi Annual Channel                            -->
-  4)  Configure Monthly (Targeted) Channel                     -->
-  5)  Configure Insider (Unsupported) Channel                  -->
+  1)  Configure Current Channel                                -->
+  2)  Configure Current Channel (Preview)                      -->
+  3)  Configure Monthly Enterprise Channel                     -->
+  4)  Configure Semi-Annual Enterprise Channel                 -->
+  5)  Configure Semi-Annual Enterprise Channel (Preview)       -->
   6)  Check your Office 365 ProPlus Configuration              -->
 
-  
   7)  Download the Office Readiness Toolkit for Add-ins & VBS  -->
   8)  Download Microsoft FixIT Removal Tool                    -->
   9)  Download Offscrub Files (Office 03,07,10, O15 & O16)     -->
   10) Download Office 2016/2019/ProPlus Group Policy Templates -->
   11) Download Office Telemetry Requirements                   -->
   
-  15) Download Office Deployment Tool (Official)               -->
-  16) Download Pre-Loaded Office 365 Configuration Files       -->
-  
-  20) Install Office 365 ProPlus                               -->
   21) Install SQL Express                                      -->
   22) Install SQL Management Studio                            -->
   23) Install Office Telemetry Dashboard                       -->
@@ -389,7 +382,7 @@
     
     }  until ($Root -eq {$Quit})
   }
-  function Get-Root1   { # Monthly Channel
+  function Get-Root1   { # Current Channel
 
     # Check if updatebranch REG_SZ Exists
     
@@ -398,18 +391,18 @@
  
      # Create REG_SZ Key for Monthly Channel
      Write-Host 'INFO:Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $DarkGreen
-     Write-host 'INFO:REG_SZ exists, Setting key for Monthly Channel' -ForegroundColor $White -BackgroundColor $DarkGreen
-     Set-ItemProperty -Path $path -Name $updatebranch -Value $Monthly
+     Write-host 'INFO:REG_SZ exists, Setting key for Current Channel' -ForegroundColor $White -BackgroundColor $DarkGreen
+     Set-ItemProperty -Path $path -Name $updatebranch -Value $Current
     } 
     else 
     {
      Write-Host 'ERROR: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Red
-     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Monthly Channel' -ForegroundColor $White -BackgroundColor $Red
+     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Current Channel' -ForegroundColor $White -BackgroundColor $Red
      New-Item -Path $path1 -Name $Key1 -ErrorAction $SilentlyContinue 
      New-Item -Path $path2 -Name $Key2 -ErrorAction $SilentlyContinue 
      New-Item -Path $path3 -Name $Key3 -ErrorAction $SilentlyContinue 
      New-Item -Path $path4 -Name $Key4 -ErrorAction $SilentlyContinue 
-     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $Monthly -Force -ErrorAction $SilentlyContinue
+     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $Current -Force -ErrorAction $SilentlyContinue
      Write-host 'INFO: REG_SZ Keys, successful created' -ForegroundColor $White -BackgroundColor $DarkGreen
     }
  
@@ -419,7 +412,7 @@
     # Return to Menu
     Get-Root
   }
-  function Get-Root2   { # Semi Annual Targeted Channel
+  function Get-Root2   { # Current Channel (Preview)
 
     # Check if updatebranch REG_SZ Exists
     if (Get-ItemProperty -Path $path -ErrorAction $SilentlyContinue)
@@ -427,18 +420,18 @@
  
      # Create REG_SZ Key for Semi Annual (Targeted) Channel
      Write-Host 'INFO: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Green
-     Write-host 'INFO: REG_SZ exists, Setting key for Semi Annual (Targeted) Channel' -ForegroundColor $White -BackgroundColor $Green
-     Set-ItemProperty -Path $path -Name $updatebranch -Value $SemiAnnualTargeted
+     Write-host 'INFO: REG_SZ exists, Setting key for Current Channel (Preview)' -ForegroundColor $White -BackgroundColor $Green
+     Set-ItemProperty -Path $path -Name $updatebranch -Value $CurrentPreview
     } 
     else 
     {
      Write-Host 'ERROR: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Red
-     Write-host 'EEROR: REG_SZ doesnt exist, creating Keys and setting key for Semi Annual (Targeted) Channel' -ForegroundColor $White -BackgroundColor $Red
+     Write-host 'EEROR: REG_SZ doesnt exist, creating Keys and setting key for Current Channel (Preview)' -ForegroundColor $White -BackgroundColor $Red
      New-Item -Path $path1 -Name $Key1 -ErrorAction $SilentlyContinue
      New-Item -Path $path2 -Name $Key2 -ErrorAction $SilentlyContinue
      New-Item -Path $path3 -Name $Key3 -ErrorAction $SilentlyContinue
      New-Item -Path $path4 -Name $Key4 -ErrorAction $SilentlyContinue
-     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $SemiAnnualTargeted -Force
+     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $CurrentPreview -Force
     }
  
     # Update Office
@@ -447,72 +440,72 @@
     # Return to Menu
     Get-Root
   }
-  function Get-Root3   { # Semi Annual Channel
+  function Get-Root3   { # Monthly Enterprise Channel
     # Check if updatebranch REG_SZ Exists
     if (Get-ItemProperty -Path $path -ErrorAction $SilentlyContinue)
     {
      # Create REG_SZ Key for Semi Annual Channel
      Write-Host 'INFO: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Green
-     Write-host 'INFO: REG_SZ exists, Setting key for Semi Annual Channel' -ForegroundColor $White -BackgroundColor $Green
+     Write-host 'INFO: REG_SZ exists, Setting key for Monthly Enterprise Channel' -ForegroundColor $White -BackgroundColor $Green
+     Set-ItemProperty -Path $path -Name $updatebranch -Value $MonthlyEnterprise
+    } 
+    else 
+    {
+     Write-Host 'ERROR: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Red
+     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Monthly Enterprise Channel' -ForegroundColor $White -BackgroundColor $Red
+     New-Item -Path $path1 -Name $Key1 -ErrorAction $SilentlyContinue
+     New-Item -Path $path2 -Name $Key2 -ErrorAction $SilentlyContinue
+     New-Item -Path $path3 -Name $Key3 -ErrorAction $SilentlyContinue
+     New-Item -Path $path4 -Name $Key4 -ErrorAction $SilentlyContinue
+     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $MonthlyEnterprise -Force
+    }
+ 
+    # Update Office
+    Start-Process -FilePath $C2RPath -ArgumentList $DisplaySetting
+ 
+    # Return to Menu
+    Get-Root
+  }
+  function Get-Root4   { # Semi-Annual Enterprise Channel
+    if (Get-ItemProperty -Path $path -ErrorAction $SilentlyContinue)
+    {
+     # Create REG_SZ Key for Semi Annual Channel
+     Write-Host 'INFO: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Green
+     Write-host 'INFO: REG_SZ exists, Setting key for Semi-Annual Enterprise Channel' -ForegroundColor $White -BackgroundColor $Green
      Set-ItemProperty -Path $path -Name $updatebranch -Value $SemiAnnual
     } 
     else 
     {
      Write-Host 'ERROR: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Red
-     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Semi Annual Channel' -ForegroundColor $White -BackgroundColor $Red
+     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Semi-Annual Enterprise Channel' -ForegroundColor $White -BackgroundColor $Red
      New-Item -Path $path1 -Name $Key1 -ErrorAction $SilentlyContinue
      New-Item -Path $path2 -Name $Key2 -ErrorAction $SilentlyContinue
      New-Item -Path $path3 -Name $Key3 -ErrorAction $SilentlyContinue
      New-Item -Path $path4 -Name $Key4 -ErrorAction $SilentlyContinue
      New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $SemiAnnual -Force
     }
- 
-    # Update Office
-    Start-Process -FilePath $C2RPath -ArgumentList $DisplaySetting
- 
-    # Return to Menu
-    Get-Root
-  }
-  function Get-Root4   { # Monthly Targeted Channel
-    if (Get-ItemProperty -Path $path -ErrorAction $SilentlyContinue)
-    {
-     # Create REG_SZ Key for Semi Annual Channel
-     Write-Host 'INFO: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Green
-     Write-host 'INFO: REG_SZ exists, Setting key for Monthly (Targeted) Channel' -ForegroundColor $White -BackgroundColor $Green
-     Set-ItemProperty -Path $path -Name $updatebranch -Value $MonthlyTargeted
-    } 
-    else 
-    {
-     Write-Host 'ERROR: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Red
-     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Monthly (Targeted) Channel' -ForegroundColor $White -BackgroundColor $Red
-     New-Item -Path $path1 -Name $Key1 -ErrorAction $SilentlyContinue
-     New-Item -Path $path2 -Name $Key2 -ErrorAction $SilentlyContinue
-     New-Item -Path $path3 -Name $Key3 -ErrorAction $SilentlyContinue
-     New-Item -Path $path4 -Name $Key4 -ErrorAction $SilentlyContinue
-     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $MonthlyTargeted -Force
-    }
     # Update Office
     Start-Process -FilePath $C2RPath -ArgumentList $DisplaySetting
     # Return to Menu
     Get-Root
   }
-  function Get-Root5   {  # InsiderFast Channel
+  function Get-Root5   {  # Semi-Annual Enterprise Channel (Preview)
      if (Get-ItemProperty -Path $path -ErrorAction $SilentlyContinue)
     {
       # Create REG_SZ Key for Semi Annual Channel
       Write-Host 'INFO: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Green
-      Write-host 'INFO: REG_SZ exists, Setting key for Insiders (Unsupported) Channel' -ForegroundColor $White -BackgroundColor $Green
-      Set-ItemProperty -Path $path -Name $updatebranch -Value $InsiderFast
+      Write-host 'INFO: REG_SZ exists, Setting key for Semi-Annual Enterprise Channel (Preview)' -ForegroundColor $White -BackgroundColor $Green
+      Set-ItemProperty -Path $path -Name $updatebranch -Value $SemiAnnualPreview
     } 
     else 
     {
      Write-Host 'ERROR: Checking if updatebranch REG_SZ already exists' -ForegroundColor $White -BackgroundColor $Red
-     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Insiders (Unsupported) Channel' -ForegroundColor $White -BackgroundColor $Red
+     Write-host 'ERROR: REG_SZ doesnt exist, creating Keys and setting key for Semi-Annual Enterprise Channel (Preview)' -ForegroundColor $White -BackgroundColor $Red
      New-Item -Path $path1 -Name $Key1 -ErrorAction $SilentlyContinue
      New-Item -Path $path2 -Name $Key2 -ErrorAction $SilentlyContinue
      New-Item -Path $path3 -Name $Key3 -ErrorAction $SilentlyContinue
      New-Item -Path $path4 -Name $Key4 -ErrorAction $SilentlyContinue
-     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $InsiderFast -Force
+     New-ItemProperty -Path $path -Name $updatebranch -PropertyType String -Value $SemiAnnualPreview -Force
     }
     # Update Office
     Start-Process -FilePath $C2RPath -ArgumentList $DisplaySetting
