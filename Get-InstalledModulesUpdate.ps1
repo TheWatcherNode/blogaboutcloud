@@ -1,4 +1,4 @@
- Clear-Host
+﻿ Clear-Host
  <#Information
  
     Author: thewatchernode
@@ -137,8 +137,8 @@
  Test-IsAdmin
  Write-host 'Version information - You are running script version 1.4' -ForegroundColor $White -BackgroundColor $DarkGray
   @'
-  ┌─────────────────────────────────────────────────────────────┐
-           Updating your PSGallery PowerShell Modules
+    ┌─────────────────────────────────────────────────────────────┐
+            Updating your Installed PowerShell Modules
 
                Follow @thewatchernode on Twitter                               
   └─────────────────────────────────────────────────────────────┘
