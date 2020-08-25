@@ -34,6 +34,8 @@
  $White = 'White'
  $DarkCyan = 'DarkCyan'
  $DarkGray = 'DarkGray'
+ $InstallDir = "$env:HOMEDRIVE\_WorkingDirectory" 
+
  #endregion
  #region Functions
  function Test-IsAdmin {
@@ -143,6 +145,6 @@
                Follow @thewatchernode on Twitter                               
   └─────────────────────────────────────────────────────────────┘
 '@
-Start-Transcript -Path $env:USERPROFILE\desktop\InstalledModuleUpdate_Log.txt
+Start-Transcript -Path $InstallDir\InstalledModuleUpdate_Log.txt
 Get-Modules
 Stop-Transcript
