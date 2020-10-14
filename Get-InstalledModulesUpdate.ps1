@@ -90,10 +90,10 @@
        # Identify modules with multiple versions installed
        $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
        # Check Module from PSGallery
-       Write-Host 'Checking',$Module.Name,'module from the PSGallery' -ForegroundColor $White -BackgroundColor $DarkCyan
+       Write-Host 'Checking',$Module.Name,'module from the PSGallery... Please wait' -ForegroundColor $White -BackgroundColor $DarkCyan
        $gallery = $module | Where-Object {$_.repositorysourcelocation}
 
-       Write-Host 'Comparing installed version against online version of',$Module.Name,'module' -ForegroundColor $White -BackgroundColor $DarkCyan
+       Write-Host 'Comparing installed version against online version of',$Module.Name,'module... Please wait' -ForegroundColor $White -BackgroundColor $DarkCyan
        foreach ($module in $gallery) {
 
          #find the current version in the gallery
