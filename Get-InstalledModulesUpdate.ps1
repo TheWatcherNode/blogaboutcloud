@@ -8,14 +8,20 @@
     .DESCRIPTION
     Tool to assist with removal of legacy installed PowerShell Module from PSGallery
 
-    Version Changes            : 0.1 Initial Script Build
+    Version Changes            
+    
+    : 0.1 Initial Script Build
     : 1.0 Initial Build Release
     : 1.1 Minor Modification
     : 1.2 Minor Modification
     : 1.3 Included logging
     : 1.4 Bug fixes 
+    : 1.5 Handle modules with dependencies
 
      
+    Credit:
+     http://www.maxtblog.com/2018/11/custom-powershell-function-to-remove-azure-module/
+
     .EXAMPLE
     .\get-installedmoduleupdate.ps1
 
@@ -102,7 +108,8 @@
          if ($online.version -gt $module.version) {
            $UpdateAvailable = 'Version removed'
            Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Warning: Legacy Version of',$Module.name,'module detected. Starting removing process'
-           Uninstall-Module -Name $Module.Name -RequiredVersion $module.version 
+           Uninstall-AllModules -TargetModule $Module.Name -Force
+           #Uninstall-Module -Name  -RequiredVersion $module.version 
            Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Info: Legacy Version of',$Module.name,'module now removed'
            Install-Module -Name $Module.Name -RequiredVersion $online.Version -Force -allowclobber
          }
@@ -133,9 +140,50 @@
      }
    }
  }
+  Function Uninstall-AllModules {
+[CmdletBinding(SupportsShouldProcess)]
+param (
+[Parameter(Mandatory = $true)]
+[string]
+$TargetModule,
+[Parameter(Mandatory = $false)]
+[string]
+$Version,
+[switch]
+$Force
+)
+
+$AllModules = @()
+
+Write-host 'Info: Checking for list of dependencies... Please wait' -ForegroundColor $Green
+$target = Find-Module $TargetModule
+$target.Dependencies | ForEach-Object {
+$AllModules += New-Object -TypeName psobject -Property @{ name = $_.name}
+}
+$AllModules += New-Object -TypeName psobject -Property @{ name = $TargetModule}
+
+$cnt = 1;
+foreach ($module in $AllModules)
+{
+Write-Host ("[$cnt] - " + 'Info: Uninstalling the following dependant modules {0} ' -f $module.name) ;
+$cnt++;
+try
+{
+if ($PSCmdlet.ShouldProcess($module.name, 'Uninstall'))
+{
+Uninstall-Module -Name $module.name -Force:$Force -ErrorAction Stop;
+};
+}
+catch
+{
+Write-Host ("`t" + $_.Exception.Message)
+}
+}
+}
+
  #endregion
  Test-IsAdmin
- Write-host 'Version information - You are running script version 1.4' -ForegroundColor $White -BackgroundColor $DarkGray
+ Write-host 'Version information - You are running script version 1.5' -ForegroundColor $White -BackgroundColor $DarkGray
   @'
     ┌─────────────────────────────────────────────────────────────┐
             Updating your Installed PowerShell Modules
