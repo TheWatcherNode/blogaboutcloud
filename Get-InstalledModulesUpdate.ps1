@@ -106,7 +106,7 @@
            Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Warning: Legacy Version of',$Module.name,'module detected. Starting removing process'
            Uninstall-Module -Name $Module.Name -RequiredVersion $module.version 
            Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Info: Legacy Version of',$Module.name,'module now removed'
-           Install-Module -Name $Module.Name -RequiredVersion $online.Version -Force -allowclobber
+           Install-Module -Name $Module.Name -RequiredVersion $online.Version -Force -AllowClobber
          }
          else {
            $UpdateAvailable = 'No update required'
