@@ -36,7 +36,18 @@
 $tenantId = '2b7c320f-0040-419a-a692-26384f0ab946'
 $client_id = 'a3cc6f6b-ae1b-4b7e-85fe-ba15f20e47cc'
 $client_secret = 'v.78~Lf1hEsGIm-Pg1Uem~VZ8PKVvA-3a~'
+$path = "$env:USERPROFILE\desktop\M365Status_Log.txt"
+
 #endregion
+
+ #region Shortnames
+ $Red = 'Red'
+ $Green = 'Green'
+ $DarkRed = 'DarkRed'
+ $White = 'White'
+ $DarkCyan = 'DarkCyan'
+ $DarkGray = 'DarkGray'
+ #endregion
 
 Function Get-M365Status {
 # Construct URI for OAuth Token
@@ -79,7 +90,7 @@ catch [System.Net.WebException] {
 # List service overview status
 $m365status.Value | Format-Table WorkloadDisplayName, StatusDisplayName, Status, IncidentIds
 }
-Write-host 'Version information - You are running script version 1.5' -ForegroundColor $White -BackgroundColor $DarkGray
+Write-host 'Version information - You are running script version 1.0' -ForegroundColor $White -BackgroundColor $DarkGray
   @'
   ┌─────────────────────────────────────────────────────────────┐
            Gather the status of Microsoft 365 Service Health
@@ -87,7 +98,7 @@ Write-host 'Version information - You are running script version 1.5' -Foregroun
                Follow @thewatchernode on Twitter                               
   └─────────────────────────────────────────────────────────────┘
 '@
-Start-Transcript -Path $InstallDir\M365Status_Log.txt
+Start-Transcript -Path $path
 Get-M365Status
 Stop-Transcript
 
