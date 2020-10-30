@@ -33,9 +33,9 @@
  #region To be configured by the script runner
 
 # Objects
-$tenantId = '2b7c320f-0040-419a-a692-26384f0ab946'
-$client_id = 'a3cc6f6b-ae1b-4b7e-85fe-ba15f20e47cc'
-$client_secret = 'v.78~Lf1hEsGIm-Pg1Uem~VZ8PKVvA-3a~'
+$tenantId = ''
+$client_id = ''
+$client_secret = ''
 $path = "$env:USERPROFILE\desktop\M365Status_Log.txt"
 
 #endregion
