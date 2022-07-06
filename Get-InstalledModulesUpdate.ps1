@@ -1,5 +1,4 @@
-﻿ Clear-Host
- <#Information
+﻿ <#Information
  
     Author: thewatchernode
     Contact: author@blogabout.cloud
@@ -17,182 +16,166 @@
     : 1.3 Included logging
     : 1.4 Bug fixes 
     : 1.5 Handle modules with dependencies
+    : 1.6 Code cleanup
 
-     
     Credit:
      http://www.maxtblog.com/2018/11/custom-powershell-function-to-remove-azure-module/
 
     .EXAMPLE
-    .\get-installedmoduleupdate.ps1
+    .\Get-InstalledModulesUpdate.ps1
 
     Description
     -----------
     Runs script with default values.
 
-
     .INPUTS
     None. You cannot pipe objects to this script.
 #>
- #region Shortnames
- $Red = 'Red'
- $Green = 'Green'
- $DarkRed = 'DarkRed'
- $White = 'White'
- $DarkCyan = 'DarkCyan'
- $DarkGray = 'DarkGray'
- $InstallDir = "$env:HOMEDRIVE\_WorkingDirectory" 
 
- #endregion
- #region Functions
- function Test-IsAdmin {
-   <#
-       .SYNOPSIS
-       Describe purpose of "Test-IsAdmin" in 1-2 sentences.
 
-       .DESCRIPTION
-       Add a more complete description of what the function does.
+$Script:Transcribing = $false
+$Script:Version = "1.6"
+$Script:TranscriptLogFolder = "$($env:HOMEDRIVE)\_PowerShellInstalledModulesUpdate" 
+$Script:UpdatedComponents = @()
 
-       .EXAMPLE
-       Test-IsAdmin
-       Describe what this call does
 
-       .NOTES
-       Place additional notes here.
-
-       .LINK
-       URLs to related sites
-       The first link is opened by Get-Help -Online Test-IsAdmin
-
-       .INPUTS
-       List of input types that are accepted by this function.
-
-       .OUTPUTS
-       List of output types produced by this function.
-   #>
-
-   ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
-
- }
- if (!(Test-IsAdmin)){
-   throw 'Please Note: You are trying to run this script without administative priviliges. In order to run this script you will required PowerShell running in Administrator Mode'
- }
- else {
-   Write-Verbose -Message 'Are you running as an Administator' -verbose
- }
-  Function Get-Modules {
-   $Array = @(Get-InstalledModule)
-
-   Foreach ($Module in $Array)
-   {
-     $ModuleCheck = Get-InstalledModule -name $Module.Name -ErrorAction SilentlyContinue   
-
-     if ($ModuleCheck) {
-       Write-Host 'Info: Detected an installation of the',$Module.Name,'Module' -ForegroundColor $Green
-       $Module = Get-InstalledModule -Name $Module.Name #-ListAvailable
-       # Identify modules with multiple versions installed
-       $g = $module | Group-Object -Property name -NoElement | Where-Object count -gt 1
-       # Check Module from PSGallery
-       Write-Host 'Checking',$Module.Name,'module from the PSGallery... Please wait' -ForegroundColor $White -BackgroundColor $DarkCyan
-       $gallery = $module | Where-Object {$_.repositorysourcelocation}
-
-       Write-Host 'Comparing installed version against online version of',$Module.Name,'module... Please wait' -ForegroundColor $White -BackgroundColor $DarkCyan
-       foreach ($module in $gallery) {
-
-         #find the current version in the gallery
-         Try {
-           $online = Find-Module -Name $module.name -Repository PSGallery -ErrorAction Stop
-         }
-         Catch {
-           Write-Warning -Message ('Module {0} was not found in the PSGallery' -f $module.name)
-         }
-
-         #compare versions
-         if ($online.version -gt $module.version) {
-           $UpdateAvailable = 'Version removed'
-           Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Warning: Legacy Version of',$Module.name,'module detected. Starting removing process'
-           Uninstall-AllModules -TargetModule $Module.Name -Force
-           #Uninstall-Module -Name $Module.Name  -RequiredVersion $module.version 
-           Write-Host -BackgroundColor $DarkRed -ForegroundColor $White 'Info: Legacy Version of',$Module.name,'module now removed'
-           Install-Module -Name $Module.Name -RequiredVersion $online.Version -Force -AllowClobber
-         }
-         else {
-           $UpdateAvailable = 'No update required'
-         }
-
-         #write a custom object to the pipeline
-         [pscustomobject]@{
-           Name = $module.name
-           MultipleVersions = ($g.name -contains $module.name)
-           InstalledVersion = $module.version
-           OnlineVersion = $online.version
-           Update = $UpdateAvailable
-           Path = $module.modulebase
-         }
- 
-       } 
-       # Microsoft Teams PowerShell Version
-       $ModuleVersion = Get-InstalledModule -Name $Module.Name | Select-Object -Property name,version
-       Write-Host 'Your client machine is running the following version of',$Module.Name,'Module' -ForegroundColor $White -BackgroundColor $DarkCyan
-       $moduleversion
-   
-     }
-     else
-     {
-       Write-Host 'Error: Failed to detect an installation of the',$Module.name,'Azure Module' -ForegroundColor $Red
-     }
-   }
- }
-  Function Uninstall-AllModules {
-[CmdletBinding(SupportsShouldProcess)]
-param (
-[Parameter(Mandatory = $true)]
-[string]
-$TargetModule,
-[Parameter(Mandatory = $false)]
-[string]
-$Version,
-[switch]
-$Force
-)
-
-$AllModules = @()
-
-Write-host 'Info: Checking for list of dependencies... Please wait' -ForegroundColor $Green
-$target = Find-Module $TargetModule
-$target.Dependencies | ForEach-Object {
-$AllModules += New-Object -TypeName psobject -Property @{ name = $_.name}
-}
-$AllModules += New-Object -TypeName psobject -Property @{ name = $TargetModule}
-
-$cnt = 1;
-foreach ($module in $AllModules)
+function Test-IsAdmin
 {
-Write-Host ("[$cnt] - " + 'Info: Uninstalling the following dependant modules {0} ' -f $module.name) ;
-$cnt++;
-try
-{
-if ($PSCmdlet.ShouldProcess($module.name, 'Uninstall'))
-{
-Uninstall-Module -Name $module.name -Force:$Force -ErrorAction Stop;
-};
-}
-catch
-{
-Write-Host ("`t" + $_.Exception.Message)
-}
-}
+  ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')
 }
 
- #endregion
- Test-IsAdmin
- Write-host 'Version information - You are running script version 1.5' -ForegroundColor $White -BackgroundColor $DarkGray
-  @'
-    ┌─────────────────────────────────────────────────────────────┐
+
+function Uninstall-AllModules
+{
+  [CmdletBinding(SupportsShouldProcess)]
+  param (
+    [Parameter(Mandatory = $true)]
+    [string] $TargetModule,
+
+    [Parameter(Mandatory = $false)]
+    [string] $Version,
+
+    [switch] $Force
+  )
+
+  $AllModules = @()
+  (Find-Module -Name $TargetModule).Dependencies | ForEach-Object {
+    $AllModules += $_.Name
+  }
+  $AllModules += $TargetModule
+
+  foreach ($Module in $AllModules)
+  {
+    try
+    {
+      # avoid updating the same component twice
+      if ( -not ($Script:UpdatedComponents -contains $Module))
+      {
+        $Type = if ($Module -eq $TargetModule) { "" } else { "dependent " }
+
+        Write-Host "Info: uninstalling the $($Type)module '$($Module)'" -ForegroundColor White -BackgroundColor DarkRed
+        if ($PSCmdlet.ShouldProcess($Module, 'Uninstall'))
+        {
+          Uninstall-Module -Name $Module -Force:$Force -ErrorAction Stop
+        }
+        $Script:UpdatedComponents += $Module
+      }
+    }
+    catch
+    {
+      Write-Host "`t$($_.Exception.Message)"
+    }
+  }
+}
+
+
+function Get-Modules
+{
+  [CmdletBinding(SupportsShouldProcess)]
+  param ()
+
+  # Iterate over all installed modules
+  $InstalledModules = @(Get-InstalledModule)
+  foreach ($InstalledModule in $InstalledModules)
+  {
+    # Check module in PSGallery
+    Write-Host "Checking '$($InstalledModule.Name)' module in PSGallery..." -ForegroundColor White -BackgroundColor DarkCyan
+
+    $ModulesWithSoureLocations = $InstalledModule | Where-Object { $_.RepositorySourceLocation }
+    foreach ($LocalModule in $ModulesWithSoureLocations) {
+      # Find the current version in the gallery
+      try
+      {
+        $OnlineModule = Find-Module -Name $LocalModule.Name -Repository PSGallery -ErrorAction Stop
+      }
+      catch
+      {
+        Write-Host "Warning: unable to find the '$($LocalModule.Name)' module in PSGallery" -ForegroundColor Yellow
+      }
+
+      # Compare versions
+      if ($OnlineModule.Version -gt $LocalModule.Version)
+      {
+        Write-Host "Info: removing legacy version of '$($LocalModule.name)' module and it's dependencies" -BackgroundColor DarkRed -ForegroundColor White
+        Uninstall-AllModules -TargetModule $LocalModule.Name -Force
+
+        Write-Host "Info: updating '$($LocalModule.name)' module to new version" -ForegroundColor White -BackgroundColor DarkCyan
+        if ($PSCmdlet.ShouldProcess("$($LocalModule.Name) $($OnlineModule.Version)", 'Install'))
+        {
+          Install-Module -Name $LocalModule.Name -RequiredVersion $OnlineModule.Version -Force -AllowClobber
+        }
+        $UpdatedVersion = $OnlineModule.Version
+      }
+      else
+      {
+        $UpdatedVersion = '(no update available)'
+      }
+
+      # Identify modules with multiple versions installed
+      $ModulesWithMultipleVersions = $InstalledModule | Group-Object -Property Name -NoElement | Where-Object { $_.count -gt 1 }
+
+      # Write a custom object to the pipeline
+      [PSCustomObject]@{
+        Name = $LocalModule.Name
+        MultipleVersions = ($ModulesWithMultipleVersions.Name -contains $LocalModule.Name)
+        InstalledVersion = $LocalModule.Version
+        UpdatedVersion = $UpdatedVersion
+      } | Format-List
+    } 
+  }
+}
+
+
+Clear-Host
+
+if ( -not (Test-IsAdmin))
+{
+  throw 'Please note: you are trying to run this script without administative priviliges. In order to run this script you will required running PowerShell in Administrator Mode!'
+}
+else
+{
+  Write-Verbose 'Are you running theis script as an Administator'
+}
+
+Write-host "Version information - You are running script version $($Script:Version)" -ForegroundColor White -BackgroundColor DarkGray
+@'
+  ┌─────────────────────────────────────────────────────────────┐
             Updating your Installed PowerShell Modules
 
-               Follow @thewatchernode on Twitter                               
+               Follow @thewatchernode on Twitter
   └─────────────────────────────────────────────────────────────┘
 '@
-Start-Transcript -Path $InstallDir\InstalledModuleUpdate_Log.txt
-Get-Modules
-Stop-Transcript
+
+try
+{
+  Start-Transcript -Path "$($Script:TranscriptLogFolder)\InstalledModuleUpdate_Log.txt"
+  $Script:Transcribing = $true
+  Get-Modules
+}
+finally
+{
+  if ($Script:Transcribing)
+  {
+    Stop-Transcript
+  }
+}
