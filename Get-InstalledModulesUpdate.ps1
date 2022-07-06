@@ -86,8 +86,6 @@ function Uninstall-AllModules
       Write-Host "`t$($_.Exception.Message)"
     }
   }
-
-
 }
 
 
