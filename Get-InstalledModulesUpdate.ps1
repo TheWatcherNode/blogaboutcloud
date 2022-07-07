@@ -154,7 +154,7 @@ if ( -not (Test-IsAdmin))
 }
 else
 {
-  Write-Verbose 'Are you running theis script as an Administator'
+  Write-Verbose 'Are you running this script as an Administator'
 }
 
 Write-host "Version information - You are running script version $($Script:Version)" -ForegroundColor White -BackgroundColor DarkGray
